@@ -1,0 +1,2429 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Python de la zero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: bară sus lipicioasă + navigator de capitole în stânga + lecția în dreapta */
+:root{
+  --bg:#f2f4f8; --surface:#ffffff; --surface2:#e8ecf4; --ink:#141b2b; --muted:#566074; --line:#d9dfe9;
+  --accent:#2756d6; --accent-ink:#ffffff; --accent-soft:#e3eafc; --hl:#f4c730;
+  --good:#14804a; --good-soft:#ddf3e6; --bad:#b3261e; --bad-soft:#fbe3e1; --warn-soft:#fff3c9; --warn-ink:#5b4300;
+  --code-bg:#0f1626; --code-ink:#e4e9f5; --code-line:#222d45; --code-muted:#8f9bb5;
+  --s-kw:#7fa6ff; --s-str:#8fe0a0; --s-num:#f6bf72; --s-cmt:#6f7e9b; --s-fn:#ffd479; --s-bi:#86d4ff;
+  --f-head:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --f-body:'IBM Plex Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c111b; --surface:#131a28; --surface2:#1b2438; --ink:#e7ecf6; --muted:#9aa6bd; --line:#27324a;
+  --accent:#7b9dff; --accent-ink:#0b1020; --accent-soft:#1c2a4e; --hl:#f4c730;
+  --good:#5ad08d; --good-soft:#12301f; --bad:#ff8a80; --bad-soft:#3a1816; --warn-soft:#3a3114; --warn-ink:#f1d98a;
+  --code-bg:#0a0f1b; --code-line:#1f2940; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0c111b; --surface:#131a28; --surface2:#1b2438; --ink:#e7ecf6; --muted:#9aa6bd; --line:#27324a;
+  --accent:#7b9dff; --accent-ink:#0b1020; --accent-soft:#1c2a4e; --hl:#f4c730;
+  --good:#5ad08d; --good-soft:#12301f; --bad:#ff8a80; --bad-soft:#3a1816; --warn-soft:#3a3114; --warn-ink:#f1d98a;
+  --code-bg:#0a0f1b; --code-line:#1f2940; color-scheme:dark;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.65 var(--f-body);margin:0}
+code,pre,textarea,kbd{font-family:var(--f-mono)}
+button{font:inherit}
+a{color:var(--accent)}
+
+/* bara de sus */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:10px 16px}
+.brand{font:700 20px/1 var(--f-head);letter-spacing:-.01em;display:flex;align-items:center;gap:10px;white-space:nowrap}
+.brand i{font-style:normal;font-family:var(--f-mono);font-weight:500;font-size:13px;background:var(--hl);color:#1a1400;padding:3px 7px;border-radius:4px}
+.prog{flex:1;display:flex;align-items:center;gap:10px;min-width:0;justify-content:flex-end}
+.prog .bar{width:min(240px,40%);height:8px;background:var(--surface2);border-radius:99px;overflow:hidden}
+.prog .bar b{display:block;height:100%;width:0;background:var(--good);transition:width .4s}
+.prog span{font:500 13px var(--f-mono);color:var(--muted);white-space:nowrap}
+.menu{display:none;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:500}
+
+/* cadru */
+.shell{display:grid;grid-template-columns:288px minmax(0,1fr);align-items:start}
+nav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 57px);height:calc(100vh - 57px);overflow:auto;padding:16px 12px 40px 16px;border-right:1px solid var(--line)}
+nav h4{font:600 12px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:18px 8px 8px}
+nav a{display:flex;gap:10px;align-items:baseline;padding:7px 10px;border-radius:8px;text-decoration:none;color:var(--ink);font-size:15px;line-height:1.35}
+nav a:hover{background:var(--surface2)}
+nav a .n{font:500 12px var(--f-mono);color:var(--muted);min-width:22px}
+nav a .t{flex:1}
+nav a .b{font:500 11px var(--f-mono);color:var(--muted)}
+nav a.on{background:var(--accent);color:var(--accent-ink)}
+nav a.on .n,nav a.on .b{color:inherit;opacity:.85}
+nav a.done .b{color:var(--good);font-weight:600}
+nav a.on.done .b{color:inherit}
+.engine{margin:18px 8px 0;font:12px/1.5 var(--f-mono);color:var(--muted)}
+.engine.ok::before{content:"● ";color:var(--good)} .engine.wait::before{content:"● ";color:var(--hl)} .engine.err{color:var(--bad)}
+main{padding:36px clamp(16px,4vw,56px) 80px;max-width:900px;width:100%}
+
+/* lecție */
+.kicker{font:500 13px var(--f-mono);color:var(--muted);letter-spacing:.04em;margin:0 0 6px}
+.chap h2{font:800 clamp(30px,5vw,46px)/1.08 var(--f-head);letter-spacing:-.02em;margin:0 0 18px;text-wrap:balance}
+.chap h3{font:700 22px/1.25 var(--f-head);margin:40px 0 10px;letter-spacing:-.01em}
+.chap p,.chap li{max-width:68ch}
+.lead{font-size:19px;line-height:1.55;border-left:4px solid var(--hl);padding-left:14px;margin:0 0 26px}
+.muted{color:var(--muted)}
+.chap ul{padding-left:22px}
+.chap li{margin:4px 0}
+:not(pre)>code{background:var(--surface2);padding:1px 6px;border-radius:5px;font-size:.88em}
+.note,.warn{padding:12px 16px;border-radius:10px;margin:16px 0;max-width:68ch;font-size:15px;line-height:1.55}
+.note{background:var(--accent-soft)}
+.warn{background:var(--warn-soft);color:var(--warn-ink)}
+.warn :not(pre)>code,.note :not(pre)>code{background:rgba(127,127,127,.18)}
+.tag{font:500 11px var(--f-mono);background:var(--surface2);color:var(--muted);padding:2px 8px;border-radius:99px;vertical-align:middle;margin-left:4px;white-space:nowrap}
+.tw{overflow-x:auto;margin:16px 0;max-width:100%}
+table{border-collapse:collapse;font-size:15px;min-width:min(100%,420px)}
+th,td{border:1px solid var(--line);padding:7px 12px;text-align:left;vertical-align:top}
+th{background:var(--surface2);font-weight:600}
+td{background:var(--surface)}
+
+/* blocuri de cod */
+.cb{margin:16px 0;border-radius:12px;overflow:hidden;background:var(--code-bg);border:1px solid var(--code-line);max-width:100%}
+.cb-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 8px 6px 14px;border-bottom:1px solid var(--code-line);font:500 12px var(--f-mono);color:var(--code-muted)}
+.cb-btns{display:flex;gap:6px}
+.cb button,.exc button{cursor:pointer;border-radius:7px;border:1px solid transparent;padding:6px 12px;font-weight:600;font-size:13px}
+.cb button.run{background:var(--accent);color:var(--accent-ink)}
+.cb button.ghost{background:transparent;color:var(--code-ink);border-color:var(--code-line)}
+.cb pre{margin:0;padding:14px 16px;overflow-x:auto;color:var(--code-ink);font-size:14px;line-height:1.6;tab-size:4}
+.cb pre code{background:none;padding:0;font-size:inherit}
+.cb .cb-out{border-top:1px dashed var(--code-line);background:rgba(255,255,255,.03);white-space:pre-wrap;word-break:break-word}
+.cb .cb-out .e{color:#ff9d93} .cb .cb-out .tip{display:block;margin-top:6px;color:#ffd479;font-family:var(--f-body);font-size:13.5px}
+.cb .cb-note{padding:6px 16px;font:12px var(--f-mono);color:var(--code-muted);border-bottom:1px solid var(--code-line)}
+.k{color:var(--s-kw)} .s{color:var(--s-str)} .m{color:var(--s-num)} .c{color:var(--s-cmt);font-style:italic} .f{color:var(--s-fn)} .b{color:var(--s-bi)}
+
+/* exerciții */
+.exc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px clamp(14px,3vw,22px) 20px;margin:20px 0}
+.exc.ok{border-color:var(--good);box-shadow:0 0 0 1px var(--good) inset}
+.exh{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.exn{font:600 12px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.exs{font:600 12px var(--f-mono);color:var(--good)}
+.ext{margin:0 0 12px;max-width:68ch}
+.ed{display:block;width:100%;background:var(--code-bg);color:var(--code-ink);border:1px solid var(--code-line);border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.6;tab-size:4;resize:vertical;min-height:96px;white-space:pre;overflow:auto}
+.ed:focus-visible,.inp:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.inp{display:block;width:100%;margin-top:8px;background:var(--surface2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:13px;min-height:60px;resize:vertical}
+.inl{font:500 12px var(--f-mono);color:var(--muted);margin-top:10px;display:block}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.exc button{background:var(--surface2);color:var(--ink);border-color:var(--line)}
+.exc button.go{background:var(--accent);color:var(--accent-ink)}
+.exc button.run2{background:var(--ink);color:var(--bg)}
+.exc button:disabled{opacity:.45;cursor:not-allowed}
+.exc button:focus-visible,.menu:focus-visible,.cb button:focus-visible,.pn button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.exc .cb{margin:12px 0 0}
+.verdict{margin-top:12px;padding:12px 14px;border-radius:10px;font-size:15px}
+.verdict.ok{background:var(--good-soft);color:var(--good)}
+.verdict.no{background:var(--bad-soft);color:var(--bad)}
+.verdict b{display:block;margin-bottom:2px}
+.verdict pre{margin:8px 0 0;font-size:13px;white-space:pre-wrap;color:var(--ink);background:var(--surface);padding:8px 10px;border-radius:8px;border:1px solid var(--line)}
+.verdict .cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hintbox{margin-top:12px;padding:10px 14px;border-radius:10px;background:var(--warn-soft);color:var(--warn-ink);font-size:15px}
+.solbox{margin-top:12px}
+.solbox .cb{margin:6px 0 0}
+.solbox small{font:12px var(--f-mono);color:var(--muted)}
+
+/* navigare capitol */
+.pn{display:flex;justify-content:space-between;gap:12px;margin-top:56px;flex-wrap:wrap}
+.pn button{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:12px 16px;border-radius:12px;cursor:pointer;text-align:left;flex:1 1 220px;min-width:0}
+.pn button small{display:block;font:500 12px var(--f-mono);color:var(--muted)}
+.pn button strong{font:700 17px var(--f-head)}
+.pn button.next{text-align:right;background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.pn button.next small{color:inherit;opacity:.85}
+.pn button:hover{filter:brightness(1.05)}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .menu{display:block}
+  nav{position:fixed;inset:0 auto 0 0;top:calc(env(safe-area-inset-top,0px) + 57px);height:auto;width:min(320px,88vw);background:var(--surface);z-index:15;transform:translateX(-102%);transition:transform .2s;border-right:1px solid var(--line);box-shadow:4px 0 24px rgba(0,0,0,.2)}
+  nav.open{transform:none}
+  .brand span.long{display:none}
+  .verdict .cmp{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:560px){
+  .top{gap:8px;padding-inline:12px}
+  .brand{font-size:17px;min-width:0}
+  .brand i{display:none}
+  .prog{flex:0 0 auto}
+  .prog .bar{width:56px}
+  .prog span{display:none}
+  .menu{padding:6px 10px;font-size:14px}
+}
+</style>
+<header class="top">
+  <button class="menu" aria-label="Deschide lista de capitole">Capitole</button>
+  <div class="brand"><i>py</i>Python de la zero</div>
+  <div class="prog"><div class="bar" role="progressbar" aria-label="Progres"><b id="pbar"></b></div><span id="ptxt">0 exerciții</span></div>
+</header>
+<div class="shell">
+<nav aria-label="Capitole"></nav>
+<main>
+<section class="chap" data-id="intro" data-title="Primii pași în Python">
+<h2>Primii pași în Python</h2>
+<p class="lead">Python este un limbaj de programare creat de Guido van Rossum (prima versiune în 1991). Este citit aproape ca engleza, are puține reguli de sintaxă și este folosit în web, analiză de date, inteligență artificială, automatizări, jocuri și științe.</p>
+
+<h3>Cum rulează un program Python</h3>
+<p>Python este un limbaj <b>interpretat</b>: un program numit <i>interpretor</i> citește codul linie cu linie și îl execută. Nu trebuie să îl compilezi manual. Ai trei moduri obișnuite de lucru:</p>
+<ul>
+<li><b>Fișier .py</b>: scrii codul într-un fișier (de exemplu <code>program.py</code>) și îl rulezi din terminal cu <code>python program.py</code>.</li>
+<li><b>Consola interactivă (REPL)</b>: scrii <code>python</code> în terminal și testezi comenzi una câte una.</li>
+<li><b>Editor sau notebook</b>: VS Code, PyCharm, Thonny (bun pentru începători) sau Jupyter.</li>
+</ul>
+<div class="note"><b>Cum funcționează site-ul acesta.</b> Codul din paginile următoare rulează direct în browser, cu un interpretor Python scris în JavaScript (Skulpt). Este Python 3 și acoperă aproape tot ce înveți la nivel de început și mediu. Câteva module (de exemplu <code>json</code>, <code>os</code>, <code>statistics</code>) nu există în el; exemplele cu ele sunt marcate <span class="tag">doar de citit</span> și le poți încerca pe calculatorul tău.</div>
+
+<h3>Primul program: print()</h3>
+<p><code>print()</code> afișează text pe ecran. Textul se scrie între ghilimele, simple sau duble.</p>
+<textarea class="code">print("Salut, lume!")
+print('Python este simplu')
+print(2024)
+print(5 + 3)</textarea>
+<p>Observă că <code>"5 + 3"</code> între ghilimele ar fi fost text, iar fără ghilimele <code>5 + 3</code> este calculat și se afișează <code>8</code>. Ghilimelele spun Python-ului „asta este text, nu o operație”.</p>
+
+<h3>Comentarii</h3>
+<p>Tot ce urmează după <code>#</code> pe o linie este ignorat de Python. Comentariile sunt notițe pentru oameni.</p>
+<textarea class="code"># Acesta este un comentariu
+print("Se afișează")   # și acesta este un comentariu, la finalul liniei
+# print("Aceasta nu se afișează, este comentată")</textarea>
+
+<h3>Reguli de bază ale sintaxei</h3>
+<ul>
+<li><b>Python deosebește literele mari de cele mici</b>: <code>Print</code> nu este același lucru cu <code>print</code>.</li>
+<li><b>Indentarea contează.</b> Blocurile de cod (după <code>if</code>, <code>for</code>, <code>def</code> etc.) se marchează prin spații la începutul liniei, nu prin acolade. Standardul este 4 spații.</li>
+<li>O instrucțiune stă de obicei pe o linie; nu e nevoie de <code>;</code> la final.</li>
+<li>Un bloc începe după o linie care se termină cu <b>două puncte</b> <code>:</code>.</li>
+</ul>
+<textarea class="code">if 3 > 2:
+    print("trei este mai mare ca doi")   # 4 spații la început
+    print("încă o linie din același bloc")
+print("aceasta este în afara blocului")</textarea>
+
+<h3>Erorile sunt normale</h3>
+<p>Când greșești, Python afișează un mesaj cu <b>tipul erorii</b> și <b>numărul liniei</b>. Citește-l: de obicei îți spune exact ce nu merge. Cele mai frecvente la început:</p>
+<table>
+<tr><th>Eroare</th><th>Ce înseamnă</th><th>Exemplu</th></tr>
+<tr><td><code>SyntaxError</code></td><td>Cod scris greșit</td><td><code>print("salut)</code></td></tr>
+<tr><td><code>NameError</code></td><td>Nume necunoscut</td><td><code>print(x)</code> fără ca <code>x</code> să existe</td></tr>
+<tr><td><code>IndentationError</code></td><td>Indentare greșită</td><td>o linie cu spații în plus</td></tr>
+<tr><td><code>TypeError</code></td><td>Tipuri incompatibile</td><td><code>"5" + 3</code></td></tr>
+<tr><td><code>ZeroDivisionError</code></td><td>Împărțire la zero</td><td><code>10 / 0</code></td></tr>
+</table>
+<textarea class="code">print("înainte de eroare")
+print(variabila_inexistenta)
+print("aceasta nu se mai execută")</textarea>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="intro1"></div>
+<div class="ex" data-ex="intro2"></div>
+<div class="ex" data-ex="intro3"></div>
+</section>
+
+<section class="chap" data-id="biblioteci" data-title="Biblioteci și import">
+<h2>Biblioteci și import</h2>
+<p class="lead">Python vine cu „baterii incluse”: sute de module gata făcute, grupate în <b>biblioteca standard</b>. Nu scrii totul de la zero: le aduci în program cu <code>import</code>.</p>
+
+<h3>Cele patru forme de import</h3>
+<textarea class="code">import math                 # aduce tot modulul; folosești math.nume
+print(math.sqrt(81))
+
+from math import pi, floor  # aduce doar numele alese, le folosești direct
+print(pi)
+print(floor(7.9))
+
+import math as m            # alias (poreclă) mai scurtă
+print(m.cos(0))
+
+from math import *          # aduce tot, direct. De evitat: poluează numele</textarea>
+<div class="note">Importurile se scriu de obicei <b>la începutul fișierului</b>. Un modul se încarcă o singură dată, chiar dacă îl imporți de mai multe ori.</div>
+
+<h3>Cum afli ce conține un modul</h3>
+<textarea class="code">import math
+print(dir(math)[:12])        # lista numelor din modul (primele 12)
+print(math.sqrt.__doc__)     # documentația unei funcții, dacă există
+# În consola Python normală poți folosi și help(math)</textarea>
+
+<h3>math: matematică</h3>
+<textarea class="code">import math
+print(math.sqrt(144))        # rădăcină pătrată -> 12.0
+print(math.pow(2, 8))        # putere, întoarce float -> 256.0
+print(math.floor(4.9))       # rotunjire în jos -> 4
+print(math.ceil(4.1))        # rotunjire în sus -> 5
+print(math.factorial(5))     # 5! = 120
+print(math.gcd(12, 18))      # cel mai mare divizor comun -> 6
+print(math.pi, math.e)       # constante
+print(math.sin(math.pi / 2)) # trigonometrie (în radiani) -> 1.0
+print(math.log(100, 10))     # logaritm în baza 10 -> 2.0
+print(math.hypot(3, 4))      # ipotenuza -> 5.0</textarea>
+
+<h3>random: numere aleatoare</h3>
+<textarea class="code">import random
+print(random.randint(1, 6))               # întreg între 1 și 6 inclusiv (ca un zar)
+print(random.random())                    # float între 0 și 1
+print(random.choice(["piatră", "foarfecă", "hârtie"]))  # un element la întâmplare
+cartele = [1, 2, 3, 4, 5]
+random.shuffle(cartele)                   # amestecă lista pe loc
+print(cartele)</textarea>
+<p>Rezultatele diferă la fiecare rulare, asta este ideea. Ruleaz-o de mai multe ori.</p>
+
+<h3>datetime și time: data și ora</h3>
+<textarea class="code">from datetime import datetime, timedelta
+acum = datetime.now()
+print(acum.year, acum.month, acum.day)
+maine = acum + timedelta(days=1)
+print("mâine este ziua", maine.day)
+print(acum.strftime("%d.%m.%Y"))   # formatare: zi.lună.an
+
+import time
+t0 = time.time()                   # secunde de la 1 ianuarie 1970
+print(type(t0))</textarea>
+
+<h3>collections: structuri de date speciale</h3>
+<textarea class="code">from collections import Counter, deque, defaultdict
+
+print(Counter("abracadabra"))                 # numără apariții
+c = Counter([1, 2, 2, 3, 3, 3])
+print(c.most_common(1))                       # cel mai frecvent
+
+d = deque([1, 2, 3])                          # coadă cu capete rapide
+d.appendleft(0)
+d.append(4)
+print(list(d))
+
+grup = defaultdict(list)                      # dicționar cu valoare implicită
+for cuvant in ["mere", "pere", "mure", "prune"]:
+    grup[len(cuvant)].append(cuvant)
+print(dict(grup))</textarea>
+
+<h3>itertools, string, copy, sys</h3>
+<textarea class="code">import itertools, string, copy, sys
+
+print(list(itertools.permutations([1, 2, 3], 2)))   # aranjamente
+print(list(itertools.combinations("abc", 2)))       # combinări
+print(string.ascii_lowercase)                       # alfabetul englez
+print(string.digits)
+
+a = [[1, 2], [3, 4]]
+b = copy.deepcopy(a)                                # copie completă, independentă
+b[0][0] = 99
+print(a, b)
+
+print(sys.version_info[0])                          # versiunea majoră de Python</textarea>
+
+<h3>re: expresii regulate</h3>
+<textarea class="code">import re
+text = "Sună la 0722 123 456 sau la 0744 987 654"
+print(re.findall(r"07\d\d \d{3} \d{3}", text))      # toate potrivirile
+print(re.split(r"\s+", "unu   doi  trei"))        # desparte după spații multiple
+print(bool(re.match(r"^[a-z]+$", "salut")))         # se potrivește?</textarea>
+
+<h3>Alte module importante <span class="tag">doar de citit</span></h3>
+<p>Aceste module există în Python-ul de pe calculator, dar nu și în motorul din browser:</p>
+<textarea class="code norun">import json                         # citit/scris date în format JSON
+date = json.loads('{"nume": "Ana", "varsta": 20}')
+print(date["nume"])
+print(json.dumps({"a": 1}))
+
+import os                           # sistemul de operare: foldere, fișiere
+print(os.listdir("."))
+
+from pathlib import Path            # căi de fișiere, modern
+print(Path("fisier.txt").exists())
+
+import statistics                   # medie, mediană, abatere standard
+print(statistics.mean([1, 2, 3, 4]))
+
+from functools import reduce, lru_cache   # unelte pentru funcții
+from heapq import heappush, heappop       # cozi de priorități
+from decimal import Decimal               # numere zecimale exacte (bani)
+from fractions import Fraction            # fracții exacte
+import argparse, logging, sqlite3, csv    # argumente CLI, loguri, baze de date, CSV</textarea>
+
+<h3>Biblioteci externe (pip)</h3>
+<p>În afara bibliotecii standard există sute de mii de pachete făcute de comunitate. Se instalează cu <code>pip</code> din terminal, apoi se importă la fel:</p>
+<textarea class="code norun">pip install requests numpy pandas matplotlib
+
+import requests                    # cereri HTTP către site-uri și API-uri
+import numpy as np                 # calcul numeric rapid (vectori, matrici)
+import pandas as pd                # tabele de date, ca un Excel în cod
+import matplotlib.pyplot as plt    # grafice
+# flask / django: site-uri web; pytest: teste; pygame: jocuri; scikit-learn, torch: AI</textarea>
+<div class="note"><b>Modulele tale.</b> Orice fișier <code>.py</code> este un modul. Dacă ai <code>utile.py</code> cu o funcție <code>salut()</code>, în alt fișier din același folder scrii <code>from utile import salut</code>.</div>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="bib1"></div>
+<div class="ex" data-ex="bib2"></div>
+<div class="ex" data-ex="bib3"></div>
+<div class="ex" data-ex="bib4"></div>
+</section>
+
+<section class="chap" data-id="variabile" data-title="Variabile">
+<h2>Variabile</h2>
+<p class="lead">O variabilă este un <b>nume</b> atașat unei valori din memorie. O creezi cu semnul <code>=</code>, fără să declari tipul în prealabil.</p>
+
+<h3>Declarare și atribuire</h3>
+<textarea class="code">nume = "Ana"          # text (str)
+varsta = 19           # număr întreg (int)
+inaltime = 1.68       # număr zecimal (float)
+student = True        # logic (bool)
+
+print(nume, varsta, inaltime, student)</textarea>
+<p>În Python nu scrii <code>int varsta</code> ca în C sau Java. Tipul îl are <b>valoarea</b>, nu numele. Se numește <i>tipare dinamică</i>: același nume poate arăta apoi spre o valoare de alt tip.</p>
+<textarea class="code">x = 10
+print(x, type(x))
+x = "zece"            # același nume, alt tip: permis
+print(x, type(x))</textarea>
+<p><code>=</code> nu înseamnă „egal” ca în matematică, ci <b>„pune valoarea din dreapta în numele din stânga”</b>. De aceea merge și asta:</p>
+<textarea class="code">contor = 1
+contor = contor + 1      # citește 1, adună 1, pune 2 înapoi în contor
+print(contor)</textarea>
+
+<h3>Cum gândești o variabilă</h3>
+<p>Imaginează-ți o etichetă lipită pe o cutie. <code>a = [1, 2]</code> creează lista și lipește eticheta <code>a</code> pe ea. <code>b = a</code> lipește o a doua etichetă pe <b>aceeași</b> cutie, nu face o copie. Vei vedea importanța la liste.</p>
+<textarea class="code">a = [1, 2, 3]
+b = a            # două nume, aceeași listă
+b.append(4)
+print(a)         # lista „a” s-a schimbat și ea!
+print(a is b)    # True: sunt același obiect
+c = a.copy()     # aici chiar facem o copie
+c.append(5)
+print(a, c)</textarea>
+
+<h3>Reguli pentru nume</h3>
+<ul>
+<li>Poate conține litere, cifre și <code>_</code>, dar <b>nu poate începe cu cifră</b>: <code>1x</code> este invalid, <code>x1</code> este valid.</li>
+<li>Fără spații sau simboluri (<code>-</code>, <code>$</code>, <code>@</code>…).</li>
+<li>Majusculele contează: <code>Scor</code>, <code>scor</code> și <code>SCOR</code> sunt trei variabile diferite.</li>
+<li>Nu poți folosi cuvinte rezervate: <code>if</code>, <code>for</code>, <code>class</code>, <code>None</code>, <code>True</code>, <code>def</code>, <code>return</code>… (lista completă: <code>import keyword; keyword.kwlist</code>).</li>
+</ul>
+<h3>Convenții (PEP 8)</h3>
+<ul>
+<li>Variabile și funcții: <code>snake_case</code> cu litere mici: <code>numar_elevi</code>.</li>
+<li>Constante (valori care nu se schimbă): <code>MAJUSCULE</code>: <code>PI = 3.14159</code>. Python nu le blochează, e doar o înțelegere între programatori.</li>
+<li>Clase: <code>CamelCase</code>: <code>ContBancar</code>.</li>
+<li>Nume sugestive: <code>pret_total</code>, nu <code>x</code> sau <code>a1</code>.</li>
+</ul>
+
+<h3>Atribuiri multiple</h3>
+<textarea class="code">a, b, c = 1, 2, 3          # trei variabile deodată
+print(a, b, c)
+
+x = y = z = 0              # aceeași valoare în trei variabile
+print(x, y, z)
+
+prenume, nume = "Ion Mihai Popescu".split()[0], "Popescu"
+print(prenume, nume)
+
+primul, *restul = [10, 20, 30, 40]   # * adună restul
+print(primul, restul)</textarea>
+
+<h3>Operatori de atribuire compusă</h3>
+<textarea class="code">scor = 10
+scor += 5       # scor = scor + 5   -> 15
+scor -= 3       # -> 12
+scor *= 2       # -> 24
+scor //= 5      # -> 4
+scor **= 3      # -> 64
+scor %= 10      # -> 4
+print(scor)</textarea>
+
+<h3>Ștergerea unei variabile și identitatea</h3>
+<textarea class="code">tmp = 100
+print(id(tmp) == id(tmp))   # id(): „adresa” obiectului
+del tmp                     # numele dispare
+try:
+    print(tmp)
+except NameError:
+    print("tmp nu mai există")</textarea>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="var1"></div>
+<div class="ex" data-ex="var2"></div>
+<div class="ex" data-ex="var3"></div>
+<div class="ex" data-ex="var4"></div>
+</section>
+
+<section class="chap" data-id="tipuri" data-title="Tipuri de date">
+<h2>Tipuri de date</h2>
+<p class="lead">Fiecare valoare are un tip, iar tipul decide ce operații sunt posibile. Cu <code>type()</code> afli tipul unei valori.</p>
+
+<table>
+<tr><th>Tip</th><th>Ce este</th><th>Exemplu</th><th>Mutabil?</th></tr>
+<tr><td><code>int</code></td><td>întreg, fără limită de mărime</td><td><code>42</code>, <code>-7</code></td><td>nu</td></tr>
+<tr><td><code>float</code></td><td>număr zecimal</td><td><code>3.14</code>, <code>2e3</code></td><td>nu</td></tr>
+<tr><td><code>complex</code></td><td>număr complex</td><td><code>2+3j</code></td><td>nu</td></tr>
+<tr><td><code>str</code></td><td>text</td><td><code>"salut"</code></td><td>nu</td></tr>
+<tr><td><code>bool</code></td><td>adevărat/fals</td><td><code>True</code>, <code>False</code></td><td>nu</td></tr>
+<tr><td><code>NoneType</code></td><td>„nimic”, lipsa unei valori</td><td><code>None</code></td><td>nu</td></tr>
+<tr><td><code>list</code></td><td>listă ordonată</td><td><code>[1, 2, 3]</code></td><td>da</td></tr>
+<tr><td><code>tuple</code></td><td>tuplu, listă fixă</td><td><code>(1, 2)</code></td><td>nu</td></tr>
+<tr><td><code>dict</code></td><td>cheie → valoare</td><td><code>{"a": 1}</code></td><td>da</td></tr>
+<tr><td><code>set</code></td><td>mulțime, fără duplicate</td><td><code>{1, 2, 3}</code></td><td>da</td></tr>
+</table>
+<p><b>Mutabil</b> înseamnă că obiectul poate fi modificat pe loc după creare. Vom reveni.</p>
+
+<textarea class="code">print(type(42))
+print(type(3.14))
+print(type("text"))
+print(type(True))
+print(type(None))
+print(type([1, 2]))
+print(type((1, 2)))
+print(type({"a": 1}))
+print(type({1, 2}))
+print(isinstance(5, int))        # verificare de tip: True
+print(isinstance(5, (int, float)))</textarea>
+
+<h3>Numere</h3>
+<textarea class="code">print(10 / 4)        # împărțirea dă mereu float: 2.5
+print(10 // 4)       # împărțire întreagă: 2
+print(10 % 4)        # restul: 2
+print(2 ** 100)      # întregii pot fi uriași, fără depășire
+print(1_000_000)     # underscore pentru lizibilitate
+print(0.1 + 0.2)     # 0.30000000000000004 : float-urile nu sunt exacte
+print(round(0.1 + 0.2, 2))
+print(abs(-7), round(3.14159, 2), divmod(17, 5))
+print(int("12") + 1, float("3.5"), 0b101, 0xFF, 0o17)   # binar, hexa, octal</textarea>
+<div class="warn"><b>Atenție la float.</b> Calculatorul stochează zecimalele în binar, deci <code>0.1 + 0.2</code> nu dă exact <code>0.3</code>. Nu compara float-uri cu <code>==</code>; rotunjește sau folosește <code>math.isclose</code>. Pentru bani folosește <code>decimal.Decimal</code>.</div>
+
+<h3>Șiruri (str)</h3>
+<textarea class="code">a = "ghilimele duble"
+b = 'ghilimele simple'
+c = "Ana spune: 'salut'"          # un tip de ghilimele în interiorul celuilalt
+d = """un text
+pe mai multe
+rânduri"""
+print(a, b, c, sep=" | ")
+print(d)
+print("ab" + "cd", "ab" * 3)       # concatenare și repetare</textarea>
+
+<h3>Booleeni și valori „adevărate”</h3>
+<p>Orice valoare poate fi folosită ca o condiție. Sunt considerate <b>False</b>: <code>False</code>, <code>None</code>, <code>0</code>, <code>0.0</code>, <code>""</code> (șir gol), <code>[]</code>, <code>()</code>, <code>{}</code>, <code>set()</code>. Orice altceva este <b>True</b>.</p>
+<textarea class="code">print(bool(0), bool(1), bool(-5))
+print(bool(""), bool("a"), bool(" "))
+print(bool([]), bool([0]))
+print(bool(None))
+print(True + True)         # bool este un tip de int: True = 1, False = 0</textarea>
+
+<h3>None</h3>
+<textarea class="code">rezultat = None            # „încă nu am o valoare”
+print(rezultat)
+print(rezultat is None)    # așa se verifică None (cu is, nu cu ==)</textarea>
+
+<h3>Conversii de tip (casting)</h3>
+<textarea class="code">print(int("25") + 5)       # text -> int: 30
+print(int(3.99))           # float -> int: se taie zecimalele: 3
+print(float("2.5") * 2)    # 5.0
+print(str(100) + " lei")   # număr -> text
+print(list("abc"))         # text -> listă de litere
+print(tuple([1, 2]), set([1, 1, 2]))
+print(bool("False"))       # True! orice șir nevid este adevărat
+print(int(True))           # 1</textarea>
+<textarea class="code">print("Am " + 20 + " ani")</textarea>
+<p>Exemplul de mai sus dă <code>TypeError</code>: nu poți aduna text cu număr. Soluții: <code>"Am " + str(20) + " ani"</code> sau f-string <code>f"Am {20} ani"</code>.</p>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="tip1"></div>
+<div class="ex" data-ex="tip2"></div>
+<div class="ex" data-ex="tip3"></div>
+<div class="ex" data-ex="tip4"></div>
+</section>
+
+<section class="chap" data-id="swap" data-title="Schimbul valorilor">
+<h2>Schimbul valorilor între variabile (swap)</h2>
+<p class="lead">O problemă clasică: ai <code>a = 1</code> și <code>b = 2</code> și vrei ca <code>a</code> să ajungă 2 și <code>b</code> să ajungă 1.</p>
+
+<h3>Greșeala tipică</h3>
+<textarea class="code">a = 1
+b = 2
+a = b      # acum a este 2... dar vechiul 1 s-a pierdut
+b = a      # b primește tot 2
+print(a, b)   # 2 2</textarea>
+
+<h3>Metoda 1: variabilă temporară</h3>
+<p>Funcționează în orice limbaj. Pui valoarea lui <code>a</code> la păstrare într-o a treia variabilă.</p>
+<textarea class="code">a = 1
+b = 2
+temp = a
+a = b
+b = temp
+print(a, b)   # 2 1</textarea>
+
+<h3>Metoda 2: specifică Python (împachetare/despachetare)</h3>
+<p>În Python schimbi direct, într-o singură linie. Partea dreaptă se evaluează întâi complet (creează un tuplu <code>(b, a)</code>), abia apoi valorile sunt puse în stânga.</p>
+<textarea class="code">a, b = 1, 2
+a, b = b, a
+print(a, b)   # 2 1</textarea>
+
+<h3>Metoda 3: aritmetică, fără variabilă în plus</h3>
+<textarea class="code">a, b = 5, 9
+a = a + b     # a = 14
+b = a - b     # b = 14 - 9 = 5
+a = a - b     # a = 14 - 5 = 9
+print(a, b)   # 9 5</textarea>
+<p>Este un truc interesant, dar în Python se folosește metoda 2, mai clară și valabilă pentru orice tip de valori, nu doar numere.</p>
+
+<h3>Rotirea a trei sau mai multe variabile</h3>
+<textarea class="code">a, b, c = 1, 2, 3
+a, b, c = b, c, a        # fiecare se mută o poziție
+print(a, b, c)           # 2 3 1</textarea>
+
+<h3>Swap între elemente de listă</h3>
+<textarea class="code">lista = [10, 20, 30, 40]
+lista[0], lista[-1] = lista[-1], lista[0]    # primul cu ultimul
+print(lista)                                 # [40, 20, 30, 10]
+lista[1], lista[2] = lista[2], lista[1]
+print(lista)</textarea>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="swap1"></div>
+<div class="ex" data-ex="swap2"></div>
+<div class="ex" data-ex="swap3"></div>
+</section>
+<section class="chap" data-id="operatori" data-title="Operatori">
+<h2>Operatori</h2>
+<h3>Aritmetici</h3>
+<table>
+<tr><th>Op.</th><th>Nume</th><th>Exemplu</th><th>Rezultat</th></tr>
+<tr><td><code>+</code></td><td>adunare</td><td><code>7 + 2</code></td><td><code>9</code></td></tr>
+<tr><td><code>-</code></td><td>scădere</td><td><code>7 - 2</code></td><td><code>5</code></td></tr>
+<tr><td><code>*</code></td><td>înmulțire</td><td><code>7 * 2</code></td><td><code>14</code></td></tr>
+<tr><td><code>/</code></td><td>împărțire (float)</td><td><code>7 / 2</code></td><td><code>3.5</code></td></tr>
+<tr><td><code>//</code></td><td>câtul întreg</td><td><code>7 // 2</code></td><td><code>3</code></td></tr>
+<tr><td><code>%</code></td><td>restul (modulo)</td><td><code>7 % 2</code></td><td><code>1</code></td></tr>
+<tr><td><code>**</code></td><td>ridicare la putere</td><td><code>7 ** 2</code></td><td><code>49</code></td></tr>
+</table>
+<textarea class="code">print(7 / 2, 7 // 2, 7 % 2, 7 ** 2)
+print(-7 // 2)      # -4 : împărțirea întreagă rotunjește în jos, spre minus infinit
+print(-7 % 2)       # 1  : restul are semnul împărțitorului
+print(10 % 2 == 0)  # test clasic de număr par
+print(2 ** 0.5)     # rădăcina pătrată a lui 2
+print(divmod(47, 10))   # (cât, rest) deodată -> (4, 7)
+
+# ultima cifră și numărul fără ultima cifră
+n = 4729
+print(n % 10, n // 10)</textarea>
+
+<h3>De comparare</h3>
+<p>Rezultatul este întotdeauna <code>True</code> sau <code>False</code>: <code>==</code> egal, <code>!=</code> diferit, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>.</p>
+<textarea class="code">print(5 == 5, 5 != 5, 3 < 4, 3 >= 4)
+print("a" < "b", "Zebra" < "ac")      # șirurile se compară alfabetic (după cod)
+print(1 < 5 < 10)                     # comparare înlănțuită: 1<5 și 5<10
+print(0 <= 15 <= 10)
+x = 5
+print(x == 5.0)                       # 5 și 5.0 sunt egale ca valoare</textarea>
+<div class="warn"><code>=</code> atribuie, <code>==</code> compară. A scrie <code>if x = 5:</code> este o eroare de sintaxă.</div>
+
+<h3>Logici: and, or, not</h3>
+<textarea class="code">varsta = 25
+print(varsta > 18 and varsta < 30)    # ambele adevărate
+print(varsta < 18 or varsta > 60)     # măcar una adevărată
+print(not varsta > 18)                # negare
+# scurtcircuit: al doilea operand nu mai e evaluat dacă rezultatul e deja cunoscut
+print(False and (1 / 0))              # nu dă eroare
+print("" or "valoare implicită")      # or întoarce primul element „adevărat”
+print("text" and "alt text")          # and întoarce ultimul dacă toate sunt adevărate</textarea>
+
+<h3>De apartenență și identitate</h3>
+<textarea class="code">print("a" in "banana", "z" not in "banana")
+print(3 in [1, 2, 3], "x" in {"x": 1})
+a = [1, 2]
+b = [1, 2]
+print(a == b)      # aceeași valoare
+print(a is b)      # același obiect în memorie? Nu
+print(a is not None)</textarea>
+
+<h3>La nivel de biți</h3>
+<textarea class="code">print(5 & 3)      # ȘI    101 & 011 = 001 -> 1
+print(5 | 3)      # SAU   101 | 011 = 111 -> 7
+print(5 ^ 3)      # XOR   101 ^ 011 = 110 -> 6
+print(~5)         # negare -> -6
+print(1 << 4)     # deplasare la stânga: 1 * 2**4 -> 16
+print(32 >> 2)    # deplasare la dreapta: 32 // 2**2 -> 8
+print(bin(10))    # reprezentare binară: 0b1010</textarea>
+
+<h3>Prioritatea operatorilor</h3>
+<p>De la cea mai mare la cea mai mică: paranteze <code>()</code>, apoi <code>**</code>, apoi <code>+x -x</code> (semn), apoi <code>* / // %</code>, apoi <code>+ -</code>, apoi comparările, apoi <code>not</code>, <code>and</code>, <code>or</code>. Când ai dubii, pune paranteze.</p>
+<textarea class="code">print(2 + 3 * 4)       # 14
+print((2 + 3) * 4)     # 20
+print(-2 ** 2)         # -4 : puterea se face înaintea semnului
+print(2 ** 3 ** 2)     # 512 : ** se evaluează de la dreapta la stânga
+print(True or False and False)   # and are prioritate față de or -> True</textarea>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="op1"></div>
+<div class="ex" data-ex="op2"></div>
+<div class="ex" data-ex="op3"></div>
+<div class="ex" data-ex="op4"></div>
+</section>
+
+<section class="chap" data-id="siruri" data-title="Șiruri de caractere">
+<h2>Șiruri de caractere (str)</h2>
+<p class="lead">Un șir este o secvență de caractere. Este <b>imutabil</b>: nu poți schimba o literă pe loc, doar creezi un șir nou.</p>
+
+<h3>Indexare și feliere (slicing)</h3>
+<p>Caracterele au poziții numerotate de la <b>0</b>. Indecșii negativi numără de la sfârșit: <code>-1</code> este ultimul.</p>
+<table>
+<tr><th>Șir</th><td><code>P</code></td><td><code>y</code></td><td><code>t</code></td><td><code>h</code></td><td><code>o</code></td><td><code>n</code></td></tr>
+<tr><th>Index</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+<tr><th>Negativ</th><td>-6</td><td>-5</td><td>-4</td><td>-3</td><td>-2</td><td>-1</td></tr>
+</table>
+<textarea class="code">s = "Python"
+print(s[0], s[5], s[-1], s[-2])
+print(s[0:3])        # de la 0 până la 3, fără 3 -> Pyt
+print(s[:2])         # primele două -> Py
+print(s[2:])         # de la 2 la final -> thon
+print(s[::2])        # din 2 în 2 -> Pto
+print(s[::-1])       # inversat -> nohtyP
+print(len(s))        # lungimea -> 6
+# s[0] = "J"         # TypeError: șirurile nu se modifică pe loc
+print("J" + s[1:])   # așa se „modifică”: construiești altul</textarea>
+<p>Sintaxa generală: <code>s[început:sfârșit:pas]</code>. Începutul este inclus, sfârșitul nu.</p>
+
+<h3>Metode utile</h3>
+<textarea class="code">t = "  Salut, Lume!  "
+print(t.strip())                   # elimină spațiile de la capete
+print(t.upper(), t.lower())
+print("python".capitalize(), "ana are mere".title())
+print("banana".count("a"))          # câte apariții
+print("banana".find("n"))           # prima poziție (sau -1 dacă nu există)
+print("banana".replace("a", "o"))
+print("a,b,c".split(","))           # șir -> listă
+print("-".join(["2024", "05", "17"]))   # listă -> șir
+print("salut".startswith("sa"), "salut".endswith("t"))
+print("123".isdigit(), "abc".isalpha(), "abc123".isalnum(), "   ".isspace())
+print("7".zfill(3))                 # 007
+print("x".center(7, "*"))           # ***x***
+print("tab\tși\nlinie nouă")        # secvențe escape</textarea>
+
+<h3>f-strings: includerea variabilelor în text</h3>
+<p>Pune <code>f</code> înaintea ghilimelelor și scrie variabile sau expresii între <code>{}</code>.</p>
+<textarea class="code">nume = "Ioana"
+varsta = 21
+pret = 12.5
+print(f"{nume} are {varsta} ani")
+print(f"peste 5 ani: {varsta + 5}")
+print(f"preț: {pret:.2f} lei")        # două zecimale
+print(f"{1234567:,}")                 # separator de mii
+print(f"{42:>8}|{42:<8}|{42:^8}|")    # aliniere dreapta, stânga, centru
+print(f"{7:03d}")                     # umplere cu zerouri -> 007
+print(f"{0.256:.1%}")                 # procent -> 25.6%
+print(f"{nume!r}")                    # varianta „de depanare” cu ghilimele</textarea>
+<p>Alte metode de formatare, mai vechi, dar întâlnite în cod: <code>"{} are {}".format(nume, varsta)</code> și <code>"%s are %d" % (nume, varsta)</code>.</p>
+
+<h3>Caractere speciale și șiruri brute</h3>
+<textarea class="code">print("Ana\nBogdan")           # \n linie nouă
+print("Coloana1\tColoana2")      # \t tab
+print("Ea a spus: \"Da\"")       # \" ghilimele în interior
+print("C:\\folder\\fisier")      # \\ backslash
+print(r"C:\folder\nou")          # r"..." (raw): nimic nu este interpretat special
+print(ord("A"), chr(66))         # cod Unicode <-> caracter</textarea>
+
+<h3>Parcurgerea unui șir</h3>
+<textarea class="code">for litera in "abc":
+    print(litera)
+print([c for c in "salut" if c in "aeiou"])    # vocalele din cuvânt
+print("racecar" == "racecar"[::-1])            # palindrom?
+print(sorted("banana"))                        # literele ordonate</textarea>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="str1"></div>
+<div class="ex" data-ex="str2"></div>
+<div class="ex" data-ex="str3"></div>
+<div class="ex" data-ex="str4"></div>
+<div class="ex" data-ex="str5"></div>
+</section>
+
+<section class="chap" data-id="io" data-title="Citire și afișare">
+<h2>Citire și afișare: input() și print()</h2>
+<h3>input(): citirea de la utilizator</h3>
+<p><code>input()</code> oprește programul, așteaptă ca utilizatorul să scrie ceva și apasă Enter, apoi întoarce ce s-a scris <b>întotdeauna ca text (str)</b>. Dacă vrei număr, îl convertești.</p>
+<textarea class="code" data-in='["Maria", "17"]'>nume = input("Cum te cheamă? ")
+varsta = int(input("Câți ani ai? "))     # convertim textul în int
+print("Salut,", nume)
+print("La anul vei avea", varsta + 1, "ani")</textarea>
+<div class="note">În exemplele de pe site, valorile pentru <code>input()</code> sunt date dintr-o casetă de lângă buton, câte una pe linie.</div>
+<div class="warn">Uitarea conversiei este o greșeală des întâlnită: <code>input()</code> pentru „5” și „3” adunate dă „53”, nu 8. Folosește <code>int(input())</code> sau <code>float(input())</code>.</div>
+<textarea class="code" data-in='["5", "3"]'>a = input()
+b = input()
+print(a + b)             # concatenare de texte
+print(int(a) + int(b))   # adunare de numere</textarea>
+<p>Mai multe valori pe aceeași linie:</p>
+<textarea class="code" data-in='["4 9 2"]'>x, y, z = map(int, input().split())
+print(x + y + z)
+valori = list(map(int, "4 9 2".split()))
+print(valori, max(valori))</textarea>
+
+<h3>print(): parametri utili</h3>
+<textarea class="code">print("a", "b", "c")                 # separate prin spațiu
+print("a", "b", "c", sep="-")        # separator ales: a-b-c
+print("fără linie nouă", end="")     # end: ce se pune la final (implicit \n)
+print(" ... continuare")
+print("1", "2", sep="", end="!\n")
+print()                              # linie goală
+print("Total:", 5 * 12, "lei")       # se pot afișa expresii și valori mixte
+print(f"Rezultat = {5 * 12}")</textarea>
+
+<h3>Exerciții</h3>
+<p class="muted">Folosește <code>input()</code> <b>fără mesaj</b> în aceste exerciții, ca ieșirea să fie exact cea cerută.</p>
+<div class="ex" data-ex="io1"></div>
+<div class="ex" data-ex="io2"></div>
+<div class="ex" data-ex="io3"></div>
+<div class="ex" data-ex="io4"></div>
+</section>
+
+<section class="chap" data-id="conditii" data-title="Condiții: if / elif / else">
+<h2>Condiții: if, elif, else</h2>
+<p class="lead">Condițiile permit programului să aleagă ce face în funcție de situație.</p>
+<textarea class="code">temperatura = 28
+
+if temperatura > 30:
+    print("Foarte cald")
+elif temperatura > 20:
+    print("Cald")        # se execută aici
+elif temperatura > 10:
+    print("Răcoros")
+else:
+    print("Frig")        # când niciuna dintre condiții nu e adevărată
+
+print("Gata")            # fără indentare: rulează oricum</textarea>
+<p>Se evaluează condițiile în ordine; <b>doar primul bloc adevărat</b> se execută, restul sunt sărite. <code>elif</code> și <code>else</code> sunt opționale.</p>
+
+<h3>Condiții compuse și imbricate</h3>
+<textarea class="code">varsta = 20
+are_permis = True
+
+if varsta >= 18 and are_permis:
+    print("Poți conduce")
+
+if varsta >= 18:
+    if are_permis:
+        print("imbricat: major cu permis")
+    else:
+        print("imbricat: major fără permis")
+
+nota = 8
+if 5 <= nota <= 10:
+    print("Promovat")</textarea>
+
+<h3>Expresia condițională (operatorul ternar)</h3>
+<textarea class="code">n = 7
+paritate = "par" if n % 2 == 0 else "impar"
+print(paritate)
+print("mare" if n > 100 else "mic")</textarea>
+
+<h3>Valori „adevărate” în condiții</h3>
+<textarea class="code">lista = []
+if lista:
+    print("lista are elemente")
+else:
+    print("lista este goală")      # [] este fals
+
+nume = ""
+if not nume:
+    print("nu ai scris niciun nume")</textarea>
+
+<h3>match / case (Python 3.10+) <span class="tag">doar de citit</span></h3>
+<textarea class="code norun">comanda = "stop"
+match comanda:
+    case "start":
+        print("pornit")
+    case "stop" | "oprire":
+        print("oprit")
+    case _:
+        print("necunoscută")</textarea>
+
+<h3>Instrucțiunea pass</h3>
+<p><code>pass</code> înseamnă „nu face nimic”; se folosește unde sintaxa cere un bloc, dar nu ai încă ce pune.</p>
+<textarea class="code">if True:
+    pass      # loc rezervat pentru cod viitor
+print("merge")</textarea>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="if1"></div>
+<div class="ex" data-ex="if2"></div>
+<div class="ex" data-ex="if3"></div>
+<div class="ex" data-ex="if4"></div>
+</section>
+
+<section class="chap" data-id="bucle" data-title="Bucle: while și for">
+<h2>Bucle: repetarea codului</h2>
+<h3>while: cât timp condiția este adevărată</h3>
+<textarea class="code">i = 1
+while i <= 5:
+    print("pasul", i)
+    i += 1             # fără asta, bucla nu s-ar termina niciodată
+print("final")</textarea>
+<div class="warn">Dacă în interiorul <code>while</code> nu schimbi nimic din ce afectează condiția, ai o <b>buclă infinită</b>. Pe site, execuția se oprește singură după câteva secunde.</div>
+
+<h3>for: parcurgerea unei secvențe</h3>
+<textarea class="code">for fruct in ["mere", "pere", "prune"]:
+    print(fruct)
+
+for litera in "abc":
+    print(litera, end=" ")
+print()
+
+total = 0
+for numar in [3, 5, 7]:
+    total += numar
+print("suma:", total)</textarea>
+
+<h3>range(): șiruri de numere</h3>
+<table>
+<tr><th>Apel</th><th>Valori generate</th></tr>
+<tr><td><code>range(5)</code></td><td>0, 1, 2, 3, 4</td></tr>
+<tr><td><code>range(2, 6)</code></td><td>2, 3, 4, 5</td></tr>
+<tr><td><code>range(0, 10, 3)</code></td><td>0, 3, 6, 9</td></tr>
+<tr><td><code>range(5, 0, -1)</code></td><td>5, 4, 3, 2, 1</td></tr>
+</table>
+<p>Sfârșitul nu este inclus, ca la slicing.</p>
+<textarea class="code">for i in range(1, 6):
+    print(i, "la pătrat:", i ** 2)
+print(sum(range(1, 101)))        # suma 1..100
+print(list(range(10, 0, -3)))</textarea>
+
+<h3>break, continue, else</h3>
+<ul>
+<li><code>break</code>: iese imediat din buclă.</li>
+<li><code>continue</code>: sare la următoarea repetiție.</li>
+<li><code>else</code> pe buclă: se execută dacă bucla s-a terminat <b>fără</b> <code>break</code>.</li>
+</ul>
+<textarea class="code">for n in range(1, 10):
+    if n % 2 == 0:
+        continue          # sărim peste numerele pare
+    if n > 7:
+        break             # ne oprim când trecem de 7
+    print(n)
+
+for k in range(2, 6):
+    if 7 % k == 0:
+        print("7 are un divizor:", k)
+        break
+else:
+    print("7 nu are divizori între 2 și 5, deci e prim")</textarea>
+
+<h3>Bucle imbricate</h3>
+<textarea class="code">for linie in range(1, 4):
+    for coloana in range(1, 4):
+        print(linie * coloana, end="\t")
+    print()
+
+for i in range(1, 5):
+    print("*" * i)</textarea>
+
+<h3>enumerate() și zip()</h3>
+<textarea class="code">nume = ["Ana", "Bogdan", "Cora"]
+note = [10, 8, 9]
+
+for poz, n in enumerate(nume, start=1):     # index + element
+    print(poz, n)
+
+for n, nota in zip(nume, note):             # două liste în paralel
+    print(n, "->", nota)</textarea>
+
+<h3>Tipare frecvente</h3>
+<textarea class="code"># 1. acumulator: sumă
+suma = 0
+for x in [4, 8, 15]:
+    suma += x
+print(suma)
+
+# 2. numărare cu condiție
+pare = 0
+for x in range(1, 21):
+    if x % 2 == 0:
+        pare += 1
+print(pare)
+
+# 3. maxim, fără max()
+maxim = None
+for x in [3, 17, 5, 12]:
+    if maxim is None or x > maxim:
+        maxim = x
+print(maxim)
+
+# 4. while cu condiție de oprire
+n = 27
+pasi = 0
+while n != 1:
+    n = n // 2 if n % 2 == 0 else 3 * n + 1    # secvența Collatz
+    pasi += 1
+print(pasi)</textarea>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="for1"></div>
+<div class="ex" data-ex="for2"></div>
+<div class="ex" data-ex="for3"></div>
+<div class="ex" data-ex="for4"></div>
+<div class="ex" data-ex="for5"></div>
+</section>
+<section class="chap" data-id="liste" data-title="Liste">
+<h2>Liste</h2>
+<p class="lead">O listă păstrează mai multe valori, ordonate, într-o singură variabilă. Este <b>mutabilă</b>: poți adăuga, șterge și schimba elemente.</p>
+<textarea class="code">note = [9, 7, 10, 8]
+mix = ["Ana", 25, True, 3.5]      # poate conține tipuri diferite
+goala = []
+print(note[0], note[-1], len(note))
+note[1] = 8                        # modificare pe loc
+print(note)
+print(note[1:3], note[::-1])       # slicing ca la șiruri</textarea>
+
+<h3>Metode importante</h3>
+<table>
+<tr><th>Metodă</th><th>Ce face</th></tr>
+<tr><td><code>l.append(x)</code></td><td>adaugă la final</td></tr>
+<tr><td><code>l.insert(i, x)</code></td><td>inserează pe poziția i</td></tr>
+<tr><td><code>l.extend(alta)</code></td><td>adaugă toate elementele din altă listă</td></tr>
+<tr><td><code>l.remove(x)</code></td><td>șterge prima apariție a valorii x</td></tr>
+<tr><td><code>l.pop()</code> / <code>l.pop(i)</code></td><td>scoate și întoarce ultimul / elementul de pe poziția i</td></tr>
+<tr><td><code>l.index(x)</code></td><td>poziția lui x</td></tr>
+<tr><td><code>l.count(x)</code></td><td>de câte ori apare x</td></tr>
+<tr><td><code>l.sort()</code></td><td>sortează pe loc</td></tr>
+<tr><td><code>l.reverse()</code></td><td>inversează pe loc</td></tr>
+<tr><td><code>l.copy()</code></td><td>copie superficială</td></tr>
+<tr><td><code>l.clear()</code></td><td>golește lista</td></tr>
+</table>
+<textarea class="code">l = [5, 2, 8]
+l.append(1)            # [5, 2, 8, 1]
+l.insert(0, 99)        # [99, 5, 2, 8, 1]
+l.extend([7, 7])       # [99, 5, 2, 8, 1, 7, 7]
+l.remove(7)            # șterge doar primul 7
+ultim = l.pop()        # scoate ultimul
+print(l, ultim)
+l.sort()
+print(l)
+l.sort(reverse=True)
+print(l)
+print(l.index(8), l.count(5), 8 in l)
+del l[0]               # șterge după poziție
+print(l)</textarea>
+
+<h3>Funcții care lucrează cu liste</h3>
+<textarea class="code">v = [4, 9, 1, 7]
+print(len(v), sum(v), min(v), max(v))
+print(sorted(v))                    # întoarce o listă nouă, v rămâne la fel
+print(sorted(v, reverse=True))
+print(v)
+print(sorted(["banana", "kiwi", "mar"], key=len))   # sortare după lungime
+print(list(reversed(v)))
+print(sum(v) / len(v))              # media</textarea>
+<div class="warn"><code>l.sort()</code> modifică lista și întoarce <code>None</code>. Greșeala <code>l = l.sort()</code> îți șterge lista.</div>
+
+<h3>Copierea listelor</h3>
+<textarea class="code">a = [1, 2, 3]
+b = a            # NU este o copie, ci același obiect
+c = a[:]         # copie (și a.copy(), și list(a))
+b.append(4)
+print(a, c)
+
+matrice = [[1, 2], [3, 4]]     # listă de liste
+copie = matrice.copy()         # superficială: sub-listele sunt partajate
+copie[0][0] = 99
+print(matrice)</textarea>
+
+<h3>Liste de liste (matrici)</h3>
+<textarea class="code">m = [[1, 2, 3],
+     [4, 5, 6],
+     [7, 8, 9]]
+print(m[1][2])                # linia 1, coloana 2 -> 6
+for linie in m:
+    print(linie, "suma:", sum(linie))
+print([linie[0] for linie in m])      # prima coloană</textarea>
+
+<h3>Concatenare, repetare, comparare</h3>
+<textarea class="code">print([1, 2] + [3], [0] * 4)
+print([1, 2, 3] == [1, 2, 3], [1, 2] < [1, 3])
+print(list("abc"), list(range(4)))</textarea>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="lst1"></div>
+<div class="ex" data-ex="lst2"></div>
+<div class="ex" data-ex="lst3"></div>
+<div class="ex" data-ex="lst4"></div>
+<div class="ex" data-ex="lst5"></div>
+</section>
+
+<section class="chap" data-id="tupluri" data-title="Tupluri">
+<h2>Tupluri (tuple)</h2>
+<p class="lead">Un tuplu este ca o listă, dar <b>imutabil</b>: odată creat, nu îl mai modifici. Se folosește pentru grupuri fixe de valori (coordonate, date calendaristice, rezultate multiple din funcții).</p>
+<textarea class="code">punct = (3, 4)
+print(punct[0], punct[1], len(punct))
+# punct[0] = 9              # TypeError: tuplul nu se modifică
+singur = (5,)               # tuplu cu un singur element: virgula contează
+fara_paranteze = 1, 2, 3    # parantezele sunt opționale
+print(type(singur), fara_paranteze)
+print((1, 2) + (3,), (0,) * 3)
+print(3 in (1, 2, 3), (1, 2, 3).index(2))</textarea>
+
+<h3>Despachetare (unpacking)</h3>
+<textarea class="code">coord = (10, 20)
+x, y = coord                  # fiecare valoare își primește numele
+print(x, y)
+
+prim, *mijloc, ultim = (1, 2, 3, 4, 5)   # * adună ce rămâne într-o listă
+print(prim, mijloc, ultim)
+
+for nume, nota in [("Ana", 10), ("Dan", 8)]:   # despachetare în for
+    print(nume, nota)
+
+def min_max(valori):
+    return min(valori), max(valori)      # o funcție poate întoarce mai multe valori
+mic, mare = min_max([4, 1, 9])
+print(mic, mare)</textarea>
+
+<h3>De ce tupluri, dacă avem liste?</h3>
+<ul>
+<li>Sunt puțin mai rapide și ocupă mai puțină memorie.</li>
+<li>Semnalează „aceste valori nu se schimbă”.</li>
+<li>Pot fi chei de dicționar sau elemente de mulțime (listele nu pot).</li>
+</ul>
+<textarea class="code">distante = {(0, 0): "origine", (1, 2): "punctul A"}
+print(distante[(1, 2)])
+
+from collections import namedtuple    # tuplu cu nume pentru câmpuri
+Punct = namedtuple("Punct", ["x", "y"])
+p = Punct(3, 4)
+print(p.x, p.y, p)</textarea>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="tup1"></div>
+<div class="ex" data-ex="tup2"></div>
+<div class="ex" data-ex="tup3"></div>
+</section>
+
+<section class="chap" data-id="dict" data-title="Dicționare">
+<h2>Dicționare (dict)</h2>
+<p class="lead">Un dicționar asociază <b>chei</b> cu <b>valori</b>, ca într-un dicționar real: cauți după cuvânt, găsești explicația. Căutarea după cheie este foarte rapidă.</p>
+<textarea class="code">persoana = {"nume": "Ana", "varsta": 21, "oras": "Cluj"}
+print(persoana["nume"])
+persoana["varsta"] = 22          # modifică
+persoana["email"] = "ana@ex.ro"  # adaugă o cheie nouă
+del persoana["oras"]             # șterge
+print(persoana)
+print(len(persoana), "nume" in persoana)</textarea>
+<p>Cheile trebuie să fie imutabile (șiruri, numere, tupluri) și unice. Valorile pot fi orice, inclusiv alte dicționare sau liste. De la Python 3.7, dicționarele păstrează ordinea inserării.</p>
+
+<h3>Accesare sigură</h3>
+<textarea class="code">d = {"a": 1, "b": 2}
+# print(d["z"])                  # KeyError dacă lipsește
+print(d.get("z"))                # None, fără eroare
+print(d.get("z", 0))             # valoare implicită
+print(d.setdefault("c", 3))      # întoarce valoarea; o creează dacă lipsea
+print(d.pop("a"))                # scoate cheia și întoarce valoarea
+print(d)</textarea>
+
+<h3>Parcurgere</h3>
+<textarea class="code">stoc = {"mere": 5, "pere": 0, "prune": 12}
+for cheie in stoc:                     # implicit parcurge cheile
+    print(cheie)
+for valoare in stoc.values():
+    print(valoare, end=" ")
+print()
+for produs, cantitate in stoc.items():  # perechi (cheie, valoare)
+    print(f"{produs}: {cantitate}")
+print(list(stoc.keys()))
+print(sum(stoc.values()))</textarea>
+
+<h3>Tipare frecvente</h3>
+<textarea class="code"># frecvența literelor
+frecv = {}
+for litera in "banana":
+    frecv[litera] = frecv.get(litera, 0) + 1
+print(frecv)
+
+# unirea a două dicționare
+a = {"x": 1, "y": 2}
+b = {"y": 99, "z": 3}
+a.update(b)                       # b are prioritate la chei comune
+print(a)
+
+# dicționar de dicționare
+elevi = {
+    "Ana": {"clasa": 10, "medie": 9.5},
+    "Dan": {"clasa": 11, "medie": 8.2},
+}
+print(elevi["Ana"]["medie"])
+
+# sortare după valoare
+scoruri = {"x": 30, "y": 10, "z": 20}
+print(sorted(scoruri.items(), key=lambda p: p[1]))</textarea>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="dic1"></div>
+<div class="ex" data-ex="dic2"></div>
+<div class="ex" data-ex="dic3"></div>
+<div class="ex" data-ex="dic4"></div>
+</section>
+
+<section class="chap" data-id="multimi" data-title="Mulțimi (set)">
+<h2>Mulțimi (set)</h2>
+<p class="lead">O mulțime păstrează elemente <b>unice</b>, fără ordine. Este ideală pentru eliminat duplicate și pentru operații ca reuniunea și intersecția.</p>
+<textarea class="code">s = {3, 1, 2, 3, 3}
+print(s)                 # duplicatele dispar
+print(set([1, 1, 2, 2, 5]))
+gol = set()              # {} ar crea un dicționar gol!
+s.add(10)
+s.discard(1)             # nu dă eroare dacă lipsește (remove da)
+print(s, len(s), 2 in s)
+print(len(set("mississippi")))   # litere distincte</textarea>
+
+<h3>Operații între mulțimi</h3>
+<textarea class="code">a = {1, 2, 3, 4}
+b = {3, 4, 5}
+print(a | b)       # reuniune
+print(a & b)       # intersecție
+print(a - b)       # diferență: în a, dar nu în b
+print(a ^ b)       # diferență simetrică: în exact una dintre ele
+print({1, 2} <= a) # submulțime
+print(a.isdisjoint({9}))
+
+lista = [4, 1, 4, 2, 1]
+print(sorted(set(lista)))   # eliminare duplicate + sortare
+print(len(lista) != len(set(lista)))   # are duplicate?</textarea>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="set1"></div>
+<div class="ex" data-ex="set2"></div>
+</section>
+
+<section class="chap" data-id="functii" data-title="Funcții">
+<h2>Funcții</h2>
+<p class="lead">O funcție este un bloc de cod cu nume, pe care îl scrii o dată și îl folosești de câte ori vrei. Evită repetarea și face programele mai clare.</p>
+<textarea class="code">def salut():                  # definirea: def nume(parametri):
+    print("Salut!")
+
+salut()                       # apelarea
+salut()
+
+def aria_dreptunghi(l, h):    # l și h sunt parametri
+    return l * h              # return trimite rezultatul înapoi
+
+print(aria_dreptunghi(3, 4))  # 3 și 4 sunt argumente
+rezultat = aria_dreptunghi(5, 2)
+print(rezultat + 1)</textarea>
+<p>Dacă o funcție nu are <code>return</code> (sau are <code>return</code> simplu), întoarce <code>None</code>. <code>return</code> oprește imediat funcția.</p>
+<div class="note"><b>print vs return.</b> <code>print</code> doar arată o valoare pe ecran; <code>return</code> o dă înapoi codului care a apelat funcția, ca să o poată folosi mai departe. Majoritatea funcțiilor trebuie să returneze, nu să afișeze.</div>
+
+<h3>Tipuri de parametri</h3>
+<textarea class="code">def salut(nume, formula="Salut"):       # valoare implicită
+    return f"{formula}, {nume}!"
+
+print(salut("Ana"))
+print(salut("Ana", "Bună ziua"))
+print(salut(formula="Hei", nume="Dan"))   # argumente cu nume, ordinea nu mai contează
+
+def suma(*numere):                       # *args: număr variabil de argumente (tuplu)
+    return sum(numere)
+print(suma(1, 2, 3, 4))
+
+def profil(**date):                      # **kwargs: argumente cu nume (dicționar)
+    for k, v in date.items():
+        print(k, "=", v)
+profil(nume="Ion", varsta=30)
+
+valori = [5, 6, 7]
+print(suma(*valori))                     # * desface lista în argumente</textarea>
+<div class="warn"><b>Capcană:</b> nu folosi o listă ca valoare implicită (<code>def f(x=[]):</code>). Obiectul este creat o singură dată și partajat între apeluri. Folosește <code>x=None</code> și creează lista în interior.</div>
+
+<h3>Domeniu de vizibilitate (scope)</h3>
+<textarea class="code">total = 100                    # variabilă globală
+
+def citeste():
+    return total + 1           # citirea unei globale merge
+
+def modifica_gresit():
+    total = 5                  # creează o variabilă LOCALĂ cu același nume
+    return total
+
+def modifica_corect():
+    global total               # declară că vrem globala (de evitat, dacă se poate)
+    total = 5
+
+print(citeste(), modifica_gresit(), total)
+modifica_corect()
+print(total)</textarea>
+<p>Regula: variabilele create într-o funcție există doar în ea. Preferă să dai valorile ca parametri și să primești rezultatul prin <code>return</code>.</p>
+
+<h3>Docstring și funcții care cheamă funcții</h3>
+<textarea class="code">def pret_cu_tva(pret, tva=0.19):
+    """Întoarce prețul cu TVA inclus."""
+    return round(pret * (1 + tva), 2)
+
+def total_cos(preturi):
+    return sum(pret_cu_tva(p) for p in preturi)
+
+print(pret_cu_tva(100))
+print(total_cos([10, 20, 30]))
+print(pret_cu_tva.__doc__)</textarea>
+
+<h3>Recursivitate</h3>
+<p>O funcție recursivă se apelează pe ea însăși. Are nevoie de un <b>caz de bază</b> (unde se oprește) și de un <b>pas recursiv</b> care se apropie de cazul de bază.</p>
+<textarea class="code">def factorial(n):
+    if n <= 1:                    # caz de bază
+        return 1
+    return n * factorial(n - 1)   # pas recursiv
+
+print(factorial(5))               # 5*4*3*2*1 = 120
+
+def fib(n):
+    if n < 2:
+        return n
+    return fib(n - 1) + fib(n - 2)
+print([fib(i) for i in range(10)])
+
+def suma_cifre(n):
+    return n if n < 10 else n % 10 + suma_cifre(n // 10)
+print(suma_cifre(4729))</textarea>
+
+<h3>Funcții lambda</h3>
+<p>O funcție anonimă, scurtă, pe o singură expresie. Folosită mai ales ca argument pentru <code>sorted</code>, <code>map</code>, <code>filter</code>.</p>
+<textarea class="code">dublu = lambda x: x * 2
+print(dublu(7))
+cuvinte = ["pară", "mărul", "kiwi", "banană"]
+print(sorted(cuvinte, key=lambda c: len(c)))
+print(sorted(cuvinte, key=lambda c: c[-1]))   # după ultima literă</textarea>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="fn1"></div>
+<div class="ex" data-ex="fn2"></div>
+<div class="ex" data-ex="fn3"></div>
+<div class="ex" data-ex="fn4"></div>
+<div class="ex" data-ex="fn5"></div>
+<div class="ex" data-ex="fn6"></div>
+</section>
+
+<section class="chap" data-id="compr" data-title="Comprehensions și funcțional">
+<h2>Comprehensions și stil funcțional</h2>
+<h3>List comprehension</h3>
+<p>O listă construită într-o singură expresie: <code>[expresie for element in secvență if condiție]</code>.</p>
+<textarea class="code">patrate = [x ** 2 for x in range(1, 6)]
+print(patrate)
+
+pare = [x for x in range(20) if x % 2 == 0]
+print(pare)
+
+mari = [c.upper() for c in ["ana", "dan"] if len(c) == 3]
+print(mari)
+
+# echivalentul cu buclă for clasică
+patrate2 = []
+for x in range(1, 6):
+    patrate2.append(x ** 2)
+print(patrate == patrate2)
+
+# cu if/else în expresie (apare ÎNAINTE de for)
+print(["par" if x % 2 == 0 else "impar" for x in range(4)])
+
+# două bucle: toate perechile
+print([(a, b) for a in "xy" for b in (1, 2)])</textarea>
+
+<h3>Dict și set comprehension</h3>
+<textarea class="code">print({x: x ** 2 for x in range(5)})
+print({c for c in "mississippi"})
+nume = ["Ana", "Bogdan"]
+print({n: len(n) for n in nume})
+inversat = {v: k for k, v in {"a": 1, "b": 2}.items()}
+print(inversat)</textarea>
+
+<h3>map, filter, sorted, any, all, sum</h3>
+<textarea class="code">v = [1, 2, 3, 4, 5, 6]
+print(list(map(lambda x: x * 10, v)))        # aplică o funcție fiecărui element
+print(list(filter(lambda x: x > 3, v)))      # păstrează elementele care trec testul
+print(sorted(v, key=lambda x: -x))           # sortare personalizată
+print(any(x > 5 for x in v))                 # măcar unul îndeplinește condiția
+print(all(x > 0 for x in v))                 # toate îndeplinesc condiția
+print(sum(x for x in v if x % 2 == 0))
+print(max(["ana", "bogdan", "cora"], key=len))
+print(list(zip("abc", [1, 2, 3])))</textarea>
+<div class="note">Comprehensions sunt scurte și clare când fac un singur lucru simplu. Dacă ajungi la condiții complicate sau trei bucle imbricate, o buclă <code>for</code> obișnuită este mai ușor de citit.</div>
+
+<h3>Expresii generator</h3>
+<p>Cu paranteze rotunde în loc de pătrate, elementele nu se creează toate deodată, ci pe rând (economie de memorie).</p>
+<textarea class="code">g = (x * x for x in range(1_000_000))
+print(next(g), next(g), next(g))    # cere elementele pe rând
+print(sum(x * x for x in range(10)))</textarea>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="cmp1"></div>
+<div class="ex" data-ex="cmp2"></div>
+<div class="ex" data-ex="cmp3"></div>
+<div class="ex" data-ex="cmp4"></div>
+</section>
+<section class="chap" data-id="exceptii" data-title="Excepții">
+<h2>Excepții: tratarea erorilor</h2>
+<p class="lead">Când apare o eroare în timpul rulării, Python „aruncă” o excepție și programul se oprește. Cu <code>try / except</code> poți prinde excepția și decide ce se întâmplă.</p>
+<textarea class="code">try:
+    print("încep")
+    print(10 / 0)              # aici apare ZeroDivisionError
+    print("nu se ajunge aici")
+except ZeroDivisionError:
+    print("nu poți împărți la zero")
+print("programul continuă")</textarea>
+
+<h3>Structura completă</h3>
+<textarea class="code">def citeste_numar(text):
+    try:
+        n = int(text)
+    except ValueError as e:                # prindem un tip anume și îl numim e
+        print("nu este număr:", e)
+        return None
+    except (TypeError, KeyError):          # mai multe tipuri deodată
+        return None
+    else:
+        print("conversie reușită")         # doar dacă NU a apărut excepție
+        return n
+    finally:
+        print("finally rulează mereu")     # curățenie: se execută oricum
+
+print(citeste_numar("42"))
+print(citeste_numar("abc"))</textarea>
+
+<h3>Excepții frecvente</h3>
+<table>
+<tr><th>Excepție</th><th>Când apare</th></tr>
+<tr><td><code>ValueError</code></td><td><code>int("abc")</code>: valoare nepotrivită</td></tr>
+<tr><td><code>TypeError</code></td><td><code>"a" + 1</code>: tip greșit</td></tr>
+<tr><td><code>IndexError</code></td><td><code>[1, 2][5]</code></td></tr>
+<tr><td><code>KeyError</code></td><td><code>{"a": 1}["b"]</code></td></tr>
+<tr><td><code>ZeroDivisionError</code></td><td><code>1 / 0</code></td></tr>
+<tr><td><code>FileNotFoundError</code></td><td>fișier inexistent</td></tr>
+<tr><td><code>AttributeError</code></td><td><code>"a".inexistent()</code></td></tr>
+</table>
+
+<h3>raise: aruncă propriile excepții</h3>
+<textarea class="code">def radical(n):
+    if n < 0:
+        raise ValueError("numărul trebuie să fie pozitiv")
+    return n ** 0.5
+
+try:
+    print(radical(16))
+    print(radical(-4))
+except ValueError as e:
+    print("Eroare:", e)
+
+class SoldInsuficient(Exception):       # excepție proprie
+    pass
+
+try:
+    raise SoldInsuficient("nu ai destui bani")
+except SoldInsuficient as e:
+    print(e)</textarea>
+<div class="note">Nu folosi <code>except:</code> gol sau <code>except Exception:</code> doar ca să „faci să tacă” eroarea: ascunzi bug-uri. Prinde tipurile concrete la care te aștepți.</div>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="exc1"></div>
+<div class="ex" data-ex="exc2"></div>
+<div class="ex" data-ex="exc3"></div>
+</section>
+
+<section class="chap" data-id="oop" data-title="Clase și obiecte (OOP)">
+<h2>Clase și obiecte (programare orientată pe obiecte)</h2>
+<p class="lead">O <b>clasă</b> este un plan (șablon); un <b>obiect</b> (instanță) este un lucru construit după plan. Clasa grupează <b>date</b> (atribute) și <b>acțiuni</b> (metode).</p>
+<textarea class="code">class Caine:
+    def __init__(self, nume, rasa):     # constructor: rulează la creare
+        self.nume = nume                # atribute ale obiectului
+        self.rasa = rasa
+        self.energie = 10
+
+    def latra(self):                    # metodă: primul parametru este mereu self
+        return f"{self.nume} spune: Ham!"
+
+    def alearga(self, minute):
+        self.energie -= minute
+        return self.energie
+
+rex = Caine("Rex", "ciobănesc")         # creăm un obiect
+bella = Caine("Bella", "beagle")
+print(rex.latra())
+print(rex.alearga(4), bella.energie)    # fiecare obiect are datele lui
+print(type(rex))</textarea>
+<p><code>self</code> este obiectul curent: prin el metodele își citesc și își schimbă propriile date.</p>
+
+<h3>Metode speciale (dunder)</h3>
+<textarea class="code">class Punct:
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+    def __str__(self):                  # ce afișează print()
+        return f"({self.x}, {self.y})"
+    def __repr__(self):                 # reprezentare pentru programatori
+        return f"Punct({self.x}, {self.y})"
+    def __add__(self, alt):             # permite p1 + p2
+        return Punct(self.x + alt.x, self.y + alt.y)
+    def __eq__(self, alt):              # permite p1 == p2
+        return self.x == alt.x and self.y == alt.y
+    def __len__(self):
+        return 2
+
+p = Punct(1, 2) + Punct(3, 4)
+print(p, [p], p == Punct(4, 6), len(p))</textarea>
+
+<h3>Moștenire</h3>
+<p>O clasă copil preia atributele și metodele clasei părinte și le poate completa sau înlocui.</p>
+<textarea class="code">class Animal:
+    def __init__(self, nume):
+        self.nume = nume
+    def sunet(self):
+        return "..."
+    def prezinta(self):
+        return f"{self.nume} face {self.sunet()}"
+
+class Pisica(Animal):               # Pisica moștenește din Animal
+    def sunet(self):                # suprascriere (override)
+        return "miau"
+
+class Vaca(Animal):
+    def __init__(self, nume, litri):
+        super().__init__(nume)      # apelează constructorul părintelui
+        self.litri = litri
+    def sunet(self):
+        return "muu"
+
+for a in [Animal("Ceva"), Pisica("Tom"), Vaca("Mița", 20)]:
+    print(a.prezinta())             # polimorfism: același apel, comportament diferit
+print(isinstance(Pisica("x"), Animal))</textarea>
+
+<h3>Atribute de clasă, metode statice, property</h3>
+<textarea class="code">class Cont:
+    banca = "Banca Rom"                # atribut de clasă: comun tuturor obiectelor
+    nr_conturi = 0
+
+    def __init__(self, titular, sold=0):
+        self.titular = titular
+        self._sold = sold               # _ : convenție „privat, nu umbla direct”
+        Cont.nr_conturi += 1
+
+    @property
+    def sold(self):                     # se citește ca un atribut: c.sold
+        return self._sold
+
+    def depune(self, suma):
+        if suma <= 0:
+            raise ValueError("suma trebuie să fie pozitivă")
+        self._sold += suma
+
+    @staticmethod
+    def valid(suma):                    # nu folosește self
+        return suma > 0
+
+    @classmethod
+    def gol(cls, titular):              # constructor alternativ
+        return cls(titular, 0)
+
+c = Cont.gol("Ana")
+c.depune(150)
+print(c.sold, Cont.nr_conturi, Cont.valid(-1))</textarea>
+
+<h3>dataclass <span class="tag">doar de citit</span></h3>
+<textarea class="code norun">from dataclasses import dataclass
+
+@dataclass
+class Produs:
+    nume: str
+    pret: float
+    stoc: int = 0
+
+p = Produs("Pix", 2.5)
+print(p)        # Produs(nume='Pix', pret=2.5, stoc=0): __init__, __repr__, __eq__ gratis</textarea>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="oop1"></div>
+<div class="ex" data-ex="oop2"></div>
+<div class="ex" data-ex="oop3"></div>
+</section>
+
+<section class="chap" data-id="fisiere" data-title="Fișiere, JSON, module">
+<h2>Fișiere, JSON, module și medii virtuale</h2>
+<p class="lead">Acest capitol nu poate rula în browser, pentru că browserul nu dă acces la fișierele tale. Codul de mai jos îl poți copia și rula local, într-un fișier <code>.py</code>.</p>
+
+<h3>Citirea și scrierea fișierelor <span class="tag">doar de citit</span></h3>
+<textarea class="code norun"># "with" închide automat fișierul, chiar dacă apare o eroare
+with open("note.txt", "w", encoding="utf-8") as f:      # w = scriere (suprascrie)
+    f.write("Ana 10\n")
+    f.write("Dan 8\n")
+
+with open("note.txt", "a", encoding="utf-8") as f:      # a = adăugare la final
+    f.write("Cora 9\n")
+
+with open("note.txt", "r", encoding="utf-8") as f:      # r = citire
+    tot = f.read()                  # tot conținutul într-un șir
+with open("note.txt", encoding="utf-8") as f:
+    for linie in f:                 # linie cu linie (eficient pentru fișiere mari)
+        nume, nota = linie.split()
+        print(nume, int(nota))
+
+import os
+if os.path.exists("note.txt"):
+    os.remove("note.txt")</textarea>
+<table>
+<tr><th>Mod</th><th>Efect</th></tr>
+<tr><td><code>"r"</code></td><td>citire (implicit); eroare dacă fișierul nu există</td></tr>
+<tr><td><code>"w"</code></td><td>scriere; creează sau <b>șterge conținutul vechi</b></td></tr>
+<tr><td><code>"a"</code></td><td>adăugare la final</td></tr>
+<tr><td><code>"rb"</code>, <code>"wb"</code></td><td>binar (imagini, arhive)</td></tr>
+</table>
+
+<h3>JSON <span class="tag">doar de citit</span></h3>
+<textarea class="code norun">import json
+
+date = {"nume": "Ana", "note": [9, 10], "activ": True}
+
+with open("date.json", "w", encoding="utf-8") as f:
+    json.dump(date, f, ensure_ascii=False, indent=2)    # dicționar -> fișier JSON
+
+with open("date.json", encoding="utf-8") as f:
+    citit = json.load(f)                                # fișier JSON -> dicționar
+print(citit["note"])
+
+text = json.dumps(date)           # dicționar -> șir
+inapoi = json.loads(text)         # șir -> dicționar</textarea>
+
+<h3>CSV <span class="tag">doar de citit</span></h3>
+<textarea class="code norun">import csv
+with open("elevi.csv", newline="", encoding="utf-8") as f:
+    for rand in csv.DictReader(f):          # fiecare rând devine un dicționar
+        print(rand["nume"], rand["media"])</textarea>
+
+<h3>Module proprii și if __name__ == "__main__" <span class="tag">doar de citit</span></h3>
+<textarea class="code norun"># fișier: geometrie.py
+PI = 3.14159
+
+def arie_cerc(r):
+    return PI * r ** 2
+
+if __name__ == "__main__":
+    # se execută doar când rulezi direct "python geometrie.py",
+    # nu și când fișierul este importat în altul
+    print(arie_cerc(2))
+
+# fișier: main.py (în același folder)
+from geometrie import arie_cerc
+print(arie_cerc(10))</textarea>
+
+<h3>Medii virtuale și pip <span class="tag">doar de citit</span></h3>
+<p>Fiecare proiect poate avea propriile pachete, izolate, într-un <b>mediu virtual</b>. Comenzi în terminal:</p>
+<textarea class="code norun">python -m venv .venv               # creează mediul în folderul .venv
+source .venv/bin/activate          # activare (Linux/macOS)
+.venv\Scripts\activate             # activare (Windows)
+pip install requests               # instalează un pachet doar în acest mediu
+pip freeze > requirements.txt      # listează pachetele proiectului
+pip install -r requirements.txt    # le reinstalează pe alt calculator
+deactivate</textarea>
+</section>
+
+<section class="chap" data-id="avansat" data-title="Subiecte avansate">
+<h2>Subiecte avansate</h2>
+<p class="lead">Instrumente pe care le vei întâlni în cod profesionist. Ia-le pe rând; nu trebuie înțelese toate din prima.</p>
+
+<h3>Generatoare și yield</h3>
+<p>O funcție cu <code>yield</code> produce valorile pe rând, păstrându-și starea între ele. Memoria rămâne mică, chiar pentru secvențe uriașe sau infinite.</p>
+<textarea class="code">def numara(pana):
+    i = 1
+    while i <= pana:
+        yield i              # „oferă” o valoare și așteaptă să fie cerută următoarea
+        i += 1
+
+for x in numara(3):
+    print(x)
+
+def fibonacci():
+    a, b = 0, 1
+    while True:              # secvență infinită: nu e problemă, valorile se cer la nevoie
+        yield a
+        a, b = b, a + b
+
+g = fibonacci()
+print([next(g) for _ in range(10)])</textarea>
+
+<h3>Closure: funcții care întorc funcții</h3>
+<textarea class="code">def fabrica_adunare(n):
+    def aduna(x):
+        return x + n         # funcția interioară „își amintește” n
+    return aduna
+
+plus5 = fabrica_adunare(5)
+plus100 = fabrica_adunare(100)
+print(plus5(1), plus100(1))
+
+</textarea>
+<p>Cu <code>nonlocal</code>, funcția interioară poate și să modifice variabila din exterior. <span class="tag">doar de citit</span></p>
+<textarea class="code norun">def contor():
+    total = 0
+    def pas():
+        nonlocal total       # modifică variabila funcției exterioare
+        total += 1
+        return total
+    return pas
+
+c = contor()
+print(c(), c(), c())       # 1 2 3</textarea>
+
+<h3>Decoratori</h3>
+<p>Un decorator primește o funcție și întoarce o versiune „îmbunătățită” a ei. Sintaxa <code>@nume</code> deasupra unei funcții este o scurtătură.</p>
+<textarea class="code">def anunta(functie):
+    def invelis(*args, **kwargs):
+        print(f"încep {functie.__name__}")
+        rezultat = functie(*args, **kwargs)
+        print("am terminat")
+        return rezultat
+    return invelis
+
+@anunta                      # echivalent cu: aduna = anunta(aduna)
+def aduna(a, b):
+    return a + b
+
+print(aduna(2, 3))</textarea>
+
+<h3>Context managers (with) <span class="tag">doar de citit</span></h3>
+<textarea class="code norun">from contextlib import contextmanager
+import time
+
+@contextmanager
+def cronometru(nume):
+    start = time.time()
+    yield                                  # aici rulează blocul din with
+    print(f"{nume}: {time.time() - start:.2f}s")
+
+with cronometru("calcul"):
+    sum(range(10_000_000))</textarea>
+
+<h3>Anotări de tip (type hints)</h3>
+<p>Nu schimbă execuția, dar documentează ce tipuri sunt așteptate și ajută editorul și instrumente ca <code>mypy</code>.</p>
+<textarea class="code">def medie(valori: list[float]) -> float:
+    return sum(valori) / len(valori)
+
+def saluta(nume: str, ori: int = 1) -> str:
+    return (f"Salut, {nume}! " * ori).strip()
+
+print(medie([8, 9, 10]), saluta("Ana", 2))</textarea>
+
+<h3>Operatorul morsă := și despachetări utile <span class="tag">doar de citit</span></h3>
+<textarea class="code norun">if (n := len("python")) > 5:     # atribuie și testează deodată
+    print(f"lung: {n}")
+
+a = {"x": 1}
+b = {"y": 2}
+print({**a, **b})                 # unirea dicționarelor
+print([*range(3), *"ab"])         # unirea secvențelor</textarea>
+
+<h3>Sortări și cheile lor</h3>
+<textarea class="code">studenti = [("Ana", 9.5, 20), ("Dan", 8.0, 19), ("Cora", 9.5, 18)]
+# după medie descrescător, apoi după nume
+print(sorted(studenti, key=lambda s: (-s[1], s[0])))
+
+from collections import Counter
+cuvinte = "unu doi trei doi trei trei".split()
+print(Counter(cuvinte).most_common())
+
+from itertools import groupby, accumulate, chain
+print(list(accumulate([1, 2, 3, 4])))           # sume parțiale
+print(list(chain([1, 2], "ab")))                # lanț de secvențe
+for cheie, grup in groupby("aabbbc"):           # grupează elemente consecutive
+    print(cheie, len(list(grup)))</textarea>
+
+<h3>Complexitatea: cât de repede crește timpul</h3>
+<p>Notația <b>O(…)</b> spune cum crește numărul de pași când datele cresc. Câteva ordine de mărime utile în Python:</p>
+<table>
+<tr><th>Operație</th><th>Cost</th></tr>
+<tr><td><code>lista[i]</code>, <code>lista.append(x)</code></td><td>O(1), instantaneu</td></tr>
+<tr><td><code>x in lista</code></td><td>O(n): se verifică element cu element</td></tr>
+<tr><td><code>x in set</code>, <code>cheie in dict</code></td><td>O(1) în medie: foarte rapid</td></tr>
+<tr><td><code>lista.sort()</code></td><td>O(n log n)</td></tr>
+<tr><td><code>lista.insert(0, x)</code></td><td>O(n): mută tot restul</td></tr>
+</table>
+<p>Dacă verifici de multe ori dacă un element există, pune datele într-un <code>set</code> sau <code>dict</code>, nu într-o listă.</p>
+
+<h3>Stil, teste și depanare <span class="tag">doar de citit</span></h3>
+<ul>
+<li><b>PEP 8</b>: ghidul de stil oficial (4 spații, nume în snake_case, linii de până la ~79–100 caractere). Unelte: <code>black</code>, <code>ruff</code>, <code>flake8</code>.</li>
+<li><b>Teste</b>: <code>assert aduna(2, 3) == 5</code> verifică rapid; pentru proiecte folosește <code>pytest</code> sau <code>unittest</code>.</li>
+<li><b>Depanare</b>: pune <code>print()</code> în puncte cheie, citește traceback-ul de jos în sus, folosește depanatorul editorului (puncte de oprire) sau <code>breakpoint()</code>.</li>
+<li><b>Documentație</b>: docstring pentru fiecare funcție, <code>README</code> pentru proiect.</li>
+</ul>
+<textarea class="code norun">def aduna(a, b):
+    return a + b
+
+assert aduna(2, 3) == 5, "2 + 3 trebuie să dea 5"
+assert aduna(-1, 1) == 0
+
+import unittest
+class TestAduna(unittest.TestCase):
+    def test_pozitive(self):
+        self.assertEqual(aduna(2, 3), 5)
+
+if __name__ == "__main__":
+    unittest.main()</textarea>
+
+<h3>Exerciții</h3>
+<div class="ex" data-ex="adv1"></div>
+<div class="ex" data-ex="adv2"></div>
+<div class="ex" data-ex="adv3"></div>
+</section>
+
+<section class="chap" data-id="proiecte" data-title="Probleme mixte și drum mai departe">
+<h2>Probleme mixte și drum mai departe</h2>
+<p class="lead">Aici combini tot ce ai învățat. Nu mai sunt indicii în enunț: gândește pașii, scrie, apoi verifică.</p>
+<div class="ex" data-ex="mix1"></div>
+<div class="ex" data-ex="mix2"></div>
+<div class="ex" data-ex="mix3"></div>
+<div class="ex" data-ex="mix4"></div>
+<div class="ex" data-ex="mix5"></div>
+<div class="ex" data-ex="mix6"></div>
+
+<h3>Ce faci după acest curs</h3>
+<table>
+<tr><th>Direcție</th><th>Biblioteci / unelte</th><th>Proiect de început</th></tr>
+<tr><td>Automatizări</td><td><code>os</code>, <code>pathlib</code>, <code>csv</code>, <code>openpyxl</code></td><td>sortează automat fișierele din Downloads</td></tr>
+<tr><td>Web scraping și API-uri</td><td><code>requests</code>, <code>beautifulsoup4</code></td><td>afișează vremea dintr-un API public</td></tr>
+<tr><td>Site-uri web</td><td><code>flask</code>, <code>django</code>, <code>fastapi</code></td><td>un blog sau o listă de sarcini</td></tr>
+<tr><td>Date și grafice</td><td><code>pandas</code>, <code>numpy</code>, <code>matplotlib</code></td><td>analizează un CSV cu cheltuielile tale</td></tr>
+<tr><td>Inteligență artificială</td><td><code>scikit-learn</code>, <code>pytorch</code></td><td>un clasificator pe un set de date mic</td></tr>
+<tr><td>Jocuri</td><td><code>pygame</code></td><td>Snake sau Pong</td></tr>
+</table>
+<h3>Cum exersezi eficient</h3>
+<ul>
+<li>Scrie cod în fiecare zi, chiar 20 de minute. Regularitatea bate maratonul.</li>
+<li>Citește mesajul erorii înainte să cauți răspunsul în altă parte.</li>
+<li>Rezolvă probleme pe platforme ca <b>pbinfo.ro</b>, <b>Codewars</b>, <b>LeetCode</b> sau <b>Advent of Code</b>.</li>
+<li>Construiește un proiect mic al tău: ceva pe care chiar l-ai folosi.</li>
+<li>Citește cod scris de alții și documentația oficială: <b>docs.python.org</b>.</li>
+</ul>
+</section>
+
+<section class="chap" data-id="joaca" data-title="Terenul de joacă">
+<h2>Terenul de joacă</h2>
+<p class="lead">Scrie orice cod Python și rulează-l. Dacă programul folosește <code>input()</code>, pune valorile în caseta de jos, câte una pe linie.</p>
+<div id="playground"></div>
+</section>
+
+</main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+<script>
+/* ===== Motor Python (Skulpt) + verificator ===== */
+var PYQ = Promise.resolve();
+function builtinRead(x){
+  if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined) throw "File not found: '" + x + "'";
+  return Sk.builtinFiles["files"][x];
+}
+function friendlyErr(e){
+  var s = String(e && e.toString ? e.toString() : e);
+  s = s.replace(/^Error:\s*/, '');
+  var m, tip = '';
+  if ((m = s.match(/NameError: name '([^']+)' is not defined/))) tip = "Numele '" + m[1] + "' nu există. Verifică ortografia (Python deosebește literele mari de cele mici) și că variabila a fost creată înainte să o folosești.";
+  else if (/SyntaxError|ParseError|bad input/.test(s)) tip = "Eroare de sintaxă: ceva este scris greșit (paranteză sau ghilimele neînchise, două puncte lipsă după if/for/def, operator greșit).";
+  else if (/IndentationError|unexpected indent|unindent/.test(s)) tip = "Eroare de indentare: liniile dintr-un bloc trebuie să înceapă cu același număr de spații (4 este standardul).";
+  else if (/ZeroDivisionError/.test(s)) tip = "Împărțire la zero, care nu este permisă.";
+  else if (/TypeError/.test(s)) tip = "Ai combinat tipuri incompatibile (de exemplu un număr cu un text) sau ai apelat ceva cu număr greșit de argumente.";
+  else if (/ValueError/.test(s)) tip = "Valoarea nu poate fi folosită așa (de exemplu int('abc')).";
+  else if (/IndexError/.test(s)) tip = "Index în afara listei sau a șirului. Primul element are indexul 0.";
+  else if (/KeyError/.test(s)) tip = "Cheia nu există în dicționar.";
+  else if (/AttributeError/.test(s)) tip = "Obiectul nu are metoda sau atributul cerut. Verifică numele și tipul obiectului.";
+  else if (/TimeLimitError|Execution exceeded/.test(s)) tip = "Programul rulează prea mult. Probabil ai o buclă infinită (condiția while nu devine niciodată falsă).";
+  else if (/ImportError|NotImplementedError/.test(s)) tip = "Modulul nu este disponibil în motorul din browser. Pe calculatorul tău, cu Python instalat, ar funcționa.";
+  else if (/EOF/.test(s)) tip = "Programul a cerut mai multe valori prin input() decât au fost date.";
+  return { raw: s, tip: tip };
+}
+async function execPy(code, inputs){
+  var out = '', q = (inputs || []).slice();
+  Sk.configure({
+    output: function(t){ out += t; },
+    read: builtinRead,
+    __future__: Sk.python3,
+    execLimit: 4000,
+    inputfun: function(){ if (!q.length) throw new Error("EOF: input() a cerut mai multe valori decât au fost date"); return q.shift(); },
+    inputfunTakesPrompt: false
+  });
+  Sk.execStart = Date.now();
+  try {
+    await Sk.misceval.asyncToPromise(function(){ return Sk.importMainWithBody('<stdin>', false, code, true); });
+    return { out: out, err: null };
+  } catch (e) {
+    return { out: out, err: friendlyErr(e) };
+  }
+}
+function runPy(code, inputs){
+  var job = PYQ.then(function(){ return execPy(code, inputs); });
+  PYQ = job.catch(function(){});
+  return job;
+}
+var PRE = "def _chk(c, m):\n    if not c:\n        print('@@FAIL@@' + m)\n";
+function normOut(s){ return s.replace(/\r/g,'').split('\n').map(function(l){ return l.replace(/\s+$/,''); }).join('\n').trim(); }
+async function verify(ex, code){
+  var i, r;
+  if (!code.trim()) return { ok:false, msg:"Scrie mai întâi codul." };
+  for (i = 0; i < (ex.must||[]).length; i++) if (!new RegExp(ex.must[i][0]).test(code)) return { ok:false, msg: ex.must[i][1] };
+  for (i = 0; i < (ex.mustNot||[]).length; i++) if (new RegExp(ex.mustNot[i][0]).test(code)) return { ok:false, msg: ex.mustNot[i][1] };
+  var tests = ex.tests || [{}];
+  for (i = 0; i < tests.length; i++) {
+    var t = tests[i];
+    var prog = code + "\nprint('@@END@@')\n" + PRE + (t.check || '') + "\n";
+    r = await runPy(prog, t.inputs);
+    var k = r.out.indexOf('@@END@@');
+    var userOut = k >= 0 ? r.out.slice(0, k) : r.out;
+    var rest = k >= 0 ? r.out.slice(k + 7) : '';
+    if (k < 0) return { ok:false, msg:"Programul s-a oprit cu o eroare înainte de final.", err:r.err, out:userOut };
+    if (r.err) { var nm = r.err.raw.match(/name '([^']+)' is not defined/); return { ok:false, msg: nm ? "Nu am găsit «" + nm[1] + "» în programul tău. Verifică cerința și ortografia numelui." : "Verificarea a întâlnit o eroare: " + r.err.raw, out:userOut }; }
+    var fails = rest.split('\n').filter(function(l){ return l.indexOf('@@FAIL@@') === 0; });
+    if (fails.length) return { ok:false, msg: fails[0].slice(8), out:userOut };
+    var n = normOut(userOut);
+    if (t.out !== undefined && n !== normOut(t.out))
+      return { ok:false, msg:"Ieșirea programului nu este cea așteptată.", out:userOut, expected:t.out, got:n, showDiff: t.show !== false };
+    if (t.end !== undefined && n.slice(-t.end.length) !== t.end)
+      return { ok:false, msg:"Ultima valoare afișată ar trebui să fie «" + t.end + "»." + (t.inputs ? " (pentru valorile de intrare: " + t.inputs.join(', ') + ")" : ""), out:userOut };
+    var hs = t.has || [];
+    for (var j = 0; j < hs.length; j++) if (n.indexOf(hs[j]) < 0) return { ok:false, msg:"În ieșire ar trebui să apară «" + hs[j] + "»." + (t.inputs ? " (pentru valorile de intrare: " + t.inputs.join(', ') + ")" : ""), out:userOut };
+    var nt = t.not || [];
+    for (var j2 = 0; j2 < nt.length; j2++) if (n.indexOf(nt[j2]) >= 0) return { ok:false, msg:"În ieșire nu ar trebui să apară «" + nt[j2] + "».", out:userOut };
+  }
+  return { ok:true };
+}
+/* ===== Exerciții ===== */
+var EX = {
+/* --- Primii pași --- */
+intro1: { text: 'Afișează pe ecran textul <code>Bună, Python!</code> (exact așa, cu diacriticele și virgula).',
+  starter: '# scrie codul tău mai jos\n', hint: 'Folosește print() și pune textul între ghilimele.',
+  sol: 'print("Bună, Python!")', tests: [{ out: 'Bună, Python!' }] },
+intro2: { text: 'Afișează două linii: pe prima <code>Eu învăț</code>, pe a doua <code>Python</code>.',
+  starter: '', hint: 'Fiecare print() începe o linie nouă. Ai nevoie de două apeluri.',
+  sol: 'print("Eu învăț")\nprint("Python")', tests: [{ out: 'Eu învăț\nPython' }] },
+intro3: { text: 'Afișează rezultatul lui <code>6 * 7</code>. Lasă Python să facă calculul, nu scrie direct răspunsul.',
+  starter: '', hint: 'print(6 * 7), fără ghilimele în jurul operației.',
+  sol: 'print(6 * 7)', mustNot: [['print\\(\\s*42\\s*\\)', 'Lasă Python să calculeze: scrie operația 6 * 7.']], tests: [{ out: '42' }] },
+
+/* --- Biblioteci --- */
+bib1: { text: 'Importă modulul <code>math</code> și afișează rădăcina pătrată a lui 144.',
+  starter: '', hint: 'import math, apoi math.sqrt(144).',
+  sol: 'import math\nprint(math.sqrt(144))', must: [['import', 'Ai nevoie de import math.'], ['sqrt', 'Folosește funcția sqrt.']], tests: [{ out: '12.0' }] },
+bib2: { text: 'Rotunjește <code>4.2</code> <b>în sus</b> cu o funcție din <code>math</code> și afișează rezultatul.',
+  starter: '', hint: 'Funcția se numește ceil (de la „ceiling”, tavan).',
+  sol: 'import math\nprint(math.ceil(4.2))', must: [['ceil', 'Folosește math.ceil.']], tests: [{ out: '5' }] },
+bib3: { text: 'Cu <code>from math import pi</code>, calculează aria unui cerc cu raza 3 în variabila <code>aria</code> (formula π · r²). Afișează-o rotunjită la 2 zecimale.',
+  starter: 'r = 3\n', hint: 'aria = pi * r ** 2, apoi print(round(aria, 2)).',
+  sol: 'from math import pi\nr = 3\naria = pi * r ** 2\nprint(round(aria, 2))', must: [['pi', 'Ai nevoie de pi din math.']], tests: [{ out: '28.27', check: '_chk(abs(aria - 28.274333882308138) < 0.001, "variabila aria trebuie să fie pi * r ** 2")' }] },
+bib4: { text: 'Importă doar funcția <code>factorial</code> din <code>math</code> (forma <code>from ... import ...</code>) și afișează 6!.',
+  starter: '', hint: 'from math import factorial, apoi print(factorial(6)).',
+  sol: 'from math import factorial\nprint(factorial(6))', must: [['from\\s+math\\s+import', 'Folosește forma from math import ...']], tests: [{ out: '720' }] },
+
+/* --- Variabile --- */
+var1: { text: 'Creează variabila <code>nume</code> cu valoarea <code>"Ana"</code> și variabila <code>varsta</code> cu valoarea <code>19</code>.',
+  starter: '', hint: 'nume = "Ana" și pe altă linie varsta = 19.',
+  sol: 'nume = "Ana"\nvarsta = 19', tests: [{ check: '_chk(nume == "Ana", "nume trebuie să fie \\"Ana\\"")\n_chk(varsta == 19 and type(varsta) == int, "varsta trebuie să fie numărul întreg 19")' }] },
+var2: { text: 'Variabilele <code>a</code> și <code>b</code> există deja. Creează <code>suma</code> (a + b) și <code>produs</code> (a * b).',
+  starter: 'a = 10\nb = 3\n', hint: 'suma = a + b',
+  sol: 'a = 10\nb = 3\nsuma = a + b\nprodus = a * b', tests: [{ check: '_chk(suma == 13, "suma trebuie să fie 13")\n_chk(produs == 30, "produs trebuie să fie 30")\n_chk(a == 10 and b == 3, "nu schimba valorile lui a și b")' }] },
+var3: { text: 'Folosește <b>o singură linie</b> (atribuire multiplă) ca să dai valoarea <code>7</code> variabilelor <code>p</code>, <code>q</code> și <code>r</code>.',
+  starter: '', hint: 'p = q = r = 7',
+  sol: 'p = q = r = 7', tests: [{ check: '_chk(p == 7 and q == 7 and r == 7, "p, q și r trebuie să fie toate 7")' }],
+  must: [['^\\s*[pqr]\\s*(=\\s*[pqr]\\s*)+=\\s*7\\s*$|^\\s*[pqr]\\s*,\\s*[pqr]\\s*,\\s*[pqr]\\s*=\\s*7\\s*,\\s*7\\s*,\\s*7\\s*$', 'Pune totul pe o singură linie.']] },
+var4: { text: 'Variabila <code>scor</code> începe de la 5. Mărește-o cu 3 folosind <code>+=</code>, apoi dublează-o folosind <code>*=</code>. Afișează <code>scor</code>.',
+  starter: 'scor = 5\n', hint: 'scor += 3 și apoi scor *= 2.',
+  sol: 'scor = 5\nscor += 3\nscor *= 2\nprint(scor)', must: [['\\+=', 'Folosește +=.'], ['\\*=', 'Folosește *=.']], tests: [{ out: '16' }] },
+
+/* --- Tipuri --- */
+tip1: { text: 'Variabila <code>n_text</code> conține textul <code>"25"</code>. Convertește-l în număr întreg, salvează-l în <code>n</code>, apoi calculează <code>rezultat = n + 5</code>.',
+  starter: 'n_text = "25"\n', hint: 'n = int(n_text)',
+  sol: 'n_text = "25"\nn = int(n_text)\nrezultat = n + 5', tests: [{ check: '_chk(type(n) == int, "n trebuie să fie de tip int")\n_chk(rezultat == 30, "rezultat trebuie să fie 30")' }] },
+tip2: { text: 'Variabila <code>x</code> este <code>3.99</code>. Salvează în <code>intreg</code> partea întreagă (fără rotunjire, doar convertire).',
+  starter: 'x = 3.99\n', hint: 'int(x) taie zecimalele.',
+  sol: 'x = 3.99\nintreg = int(x)', must: [['int\\(', 'Folosește int().']], tests: [{ check: '_chk(intreg == 3 and type(intreg) == int, "intreg trebuie să fie 3, de tip int")' }] },
+tip3: { text: 'Afișează <b>tipul</b> valorii <code>3.5</code>.',
+  starter: '', hint: 'print(type(3.5))',
+  sol: 'print(type(3.5))', tests: [{ out: "<class 'float'>" }] },
+tip4: { text: 'Afișează pe o singură linie, separate prin spațiu, valorile de adevăr ale lui <code>0</code>, <code>"ok"</code> și <code>[]</code> (folosește <code>bool()</code>).',
+  starter: '', hint: 'print(bool(0), bool("ok"), bool([]))',
+  sol: 'print(bool(0), bool("ok"), bool([]))', must: [['bool', 'Folosește bool().']], tests: [{ out: 'False True False' }] },
+
+/* --- Swap --- */
+swap1: { text: 'Variabilele <code>a = 1</code> și <code>b = 2</code> există. Schimbă-le valorile între ele, astfel încât <code>a</code> să devină 2 și <code>b</code> să devină 1. Nu atribui direct 2 și 1.',
+  starter: 'a = 1\nb = 2\n', hint: 'a, b = b, a',
+  sol: 'a = 1\nb = 2\na, b = b, a', mustNot: [['a\\s*=\\s*2\\b', 'Nu atribui direct valorile; fă schimbul.'], ['b\\s*=\\s*1\\b', 'Nu atribui direct valorile; fă schimbul.']],
+  tests: [{ check: '_chk(a == 2 and b == 1, "după schimb a trebuie să fie 2, iar b 1")' }] },
+swap2: { text: 'Rotește trei variabile: după rulare, <code>x</code> trebuie să aibă vechea valoare a lui <code>z</code>, <code>y</code> vechea valoare a lui <code>x</code>, iar <code>z</code> vechea valoare a lui <code>y</code>.',
+  starter: 'x, y, z = 1, 2, 3\n', hint: 'x, y, z = z, x, y',
+  sol: 'x, y, z = 1, 2, 3\nx, y, z = z, x, y', mustNot: [['x\\s*=\\s*3\\b', 'Fă rotirea, nu atribui direct.']],
+  tests: [{ check: '_chk((x, y, z) == (3, 1, 2), "rezultatul corect este x=3, y=1, z=2")' }] },
+swap3: { text: 'În lista <code>lista</code>, schimbă între ele <b>primul</b> și <b>ultimul</b> element.',
+  starter: 'lista = [1, 2, 3, 4, 5]\n', hint: 'lista[0], lista[-1] = lista[-1], lista[0]',
+  sol: 'lista = [1, 2, 3, 4, 5]\nlista[0], lista[-1] = lista[-1], lista[0]', mustNot: [['lista\\s*=\\s*\\[\\s*5', 'Schimbă elementele, nu rescrie lista.']],
+  tests: [{ check: '_chk(lista == [5, 2, 3, 4, 1], "lista trebuie să fie [5, 2, 3, 4, 1]")' }] },
+
+/* --- Operatori --- */
+op1: { text: 'Pentru <code>n = 47</code>, salvează în <code>cat</code> câtul întreg al împărțirii la 10 și în <code>rest</code> restul împărțirii la 10.',
+  starter: 'n = 47\n', hint: 'Câtul întreg: n // 10. Restul: n % 10.',
+  sol: 'n = 47\ncat = n // 10\nrest = n % 10', must: [['//', 'Folosește //.'], ['%', 'Folosește %.']], tests: [{ check: '_chk(cat == 4, "cat trebuie să fie 4")\n_chk(rest == 7, "rest trebuie să fie 7")' }] },
+op2: { text: 'Pentru <code>n = 14</code>, salvează în <code>e_par</code> valoarea <code>True</code> dacă n este par și <code>False</code> dacă nu (printr-o expresie, nu scrisă de mână).',
+  starter: 'n = 14\n', hint: 'Un număr este par dacă restul împărțirii la 2 este 0: n % 2 == 0.',
+  sol: 'n = 14\ne_par = n % 2 == 0', must: [['%', 'Folosește operatorul %.']], tests: [{ check: '_chk(e_par is True, "e_par trebuie să fie True pentru n = 14")' }] },
+op3: { text: 'Pentru <code>x = 15</code>, afișează dacă x este între 10 și 20 <b>inclusiv</b>, folosind o comparare înlănțuită (<code>a &lt;= x &lt;= b</code>).',
+  starter: 'x = 15\n', hint: 'print(10 <= x <= 20)',
+  sol: 'x = 15\nprint(10 <= x <= 20)', must: [['<=.*<=', 'Folosește comparare înlănțuită, cu două <=.']], tests: [{ out: 'True' }] },
+op4: { text: 'Calculează media aritmetică a numerelor 7, 8 și 12 în variabila <code>media</code>.',
+  starter: '', hint: 'media = (7 + 8 + 12) / 3. Atenție la paranteze.',
+  sol: 'media = (7 + 8 + 12) / 3', tests: [{ check: '_chk(media == 9, "media trebuie să fie 9.0")' }] },
+
+/* --- Șiruri --- */
+str1: { text: 'Pentru <code>cuvant = "programare"</code>, salvează primul caracter în <code>prima</code> și ultimul în <code>ultima</code>.',
+  starter: 'cuvant = "programare"\n', hint: 'Primul are indexul 0, ultimul are indexul -1.',
+  sol: 'cuvant = "programare"\nprima = cuvant[0]\nultima = cuvant[-1]', tests: [{ check: '_chk(prima == "p", "prima trebuie să fie \\"p\\"")\n_chk(ultima == "e", "ultima trebuie să fie \\"e\\"")' }] },
+str2: { text: 'Salvează în <code>inversat</code> varianta <b>inversată</b> a șirului <code>text</code>, folosind slicing.',
+  starter: 'text = "python"\n', hint: 'text[::-1]',
+  sol: 'text = "python"\ninversat = text[::-1]', must: [['\\[\\s*:\\s*:\\s*-1\\s*\\]', 'Folosește slicing cu pas -1: [::-1].']], tests: [{ check: '_chk(inversat == "nohtyp", "inversat trebuie să fie nohtyp")' }] },
+str3: { text: 'Folosește un <b>f-string</b> și variabilele <code>nume</code> și <code>varsta</code> ca să afișezi <code>Ion are 30 de ani</code>.',
+  starter: 'nume = "Ion"\nvarsta = 30\n', hint: 'print(f"{nume} are {varsta} de ani")',
+  sol: 'nume = "Ion"\nvarsta = 30\nprint(f"{nume} are {varsta} de ani")', must: [['f["\']', 'Folosește un f-string: f"..."'], ['\\{', 'Pune variabilele între acolade.']], tests: [{ out: 'Ion are 30 de ani' }] },
+str4: { text: 'Salvează în <code>rezultat</code> textul <code>s</code> fără spațiile de la capete și cu toate literele mari.',
+  starter: 's = "  Salut Lume  "\n', hint: 's.strip().upper()',
+  sol: 's = "  Salut Lume  "\nrezultat = s.strip().upper()', tests: [{ check: '_chk(rezultat == "SALUT LUME", "rezultat trebuie să fie SALUT LUME")' }] },
+str5: { text: 'Afișează de câte ori apare litera <code>a</code> în <code>"banana"</code>.',
+  starter: '', hint: '"banana".count("a")',
+  sol: 'print("banana".count("a"))', must: [['count', 'Folosește metoda count.']], tests: [{ out: '3' }] },
+
+/* --- Input/Output --- */
+io1: { text: 'Citește un nume cu <code>input()</code> (fără mesaj) și afișează <code>Salut, NUME!</code>',
+  starter: '', hint: 'nume = input() și apoi print(f"Salut, {nume}!").',
+  sol: 'nume = input()\nprint(f"Salut, {nume}!")', tests: [{ inputs: ['Maria'], out: 'Salut, Maria!' }, { inputs: ['Ion'], out: 'Salut, Ion!' }] },
+io2: { text: 'Citește două numere întregi (câte unul pe linie, cu <code>input()</code> fără mesaj) și afișează suma lor.',
+  starter: '', hint: 'Convertește fiecare valoare cu int(input()).',
+  sol: 'a = int(input())\nb = int(input())\nprint(a + b)', tests: [{ inputs: ['3', '4'], out: '7' }, { inputs: ['10', '-4'], out: '6' }] },
+io3: { text: 'Folosind parametrul <code>sep</code> al lui <code>print</code>, afișează <code>17.05.2024</code> din trei valori separate: <code>"17"</code>, <code>"05"</code>, <code>"2024"</code>.',
+  starter: '', hint: 'print("17", "05", "2024", sep=".")',
+  sol: 'print("17", "05", "2024", sep=".")', must: [['sep', 'Folosește parametrul sep.']], tests: [{ out: '17.05.2024' }] },
+io4: { text: 'Citește raza unui cerc (poate fi zecimală) și afișează aria cu <b>2 zecimale</b>, folosind <code>3.14</code> pentru π.',
+  starter: '', hint: 'raza = float(input()); aria = 3.14 * raza ** 2; apoi f"{aria:.2f}".',
+  sol: 'raza = float(input())\naria = 3.14 * raza ** 2\nprint(f"{aria:.2f}")', tests: [{ inputs: ['2'], out: '12.56' }, { inputs: ['10'], out: '314.00' }] },
+
+/* --- Condiții --- */
+if1: { text: 'Citește un număr întreg (<code>input()</code> fără mesaj) și afișează <code>pozitiv</code>, <code>negativ</code> sau <code>zero</code>.',
+  starter: '', hint: 'if n > 0: ... elif n < 0: ... else: ...',
+  sol: 'n = int(input())\nif n > 0:\n    print("pozitiv")\nelif n < 0:\n    print("negativ")\nelse:\n    print("zero")',
+  tests: [{ inputs: ['5'], out: 'pozitiv' }, { inputs: ['-3'], out: 'negativ' }, { inputs: ['0'], out: 'zero' }] },
+if2: { text: 'Citește o vârstă și afișează <code>major</code> dacă este cel puțin 18, altfel <code>minor</code>.',
+  starter: '', hint: 'Atenție la 18: este major (>=).',
+  sol: 'v = int(input())\nif v >= 18:\n    print("major")\nelse:\n    print("minor")',
+  tests: [{ inputs: ['17'], out: 'minor' }, { inputs: ['18'], out: 'major' }, { inputs: ['40'], out: 'major' }] },
+if3: { text: 'Citește o notă și afișează: <code>foarte bine</code> pentru 9 sau mai mult, <code>bine</code> pentru 7 sau mai mult, <code>suficient</code> pentru 5 sau mai mult, altfel <code>insuficient</code>.',
+  starter: '', hint: 'Verifică de la cea mai mare limită la cea mai mică, cu elif.',
+  sol: 'n = int(input())\nif n >= 9:\n    print("foarte bine")\nelif n >= 7:\n    print("bine")\nelif n >= 5:\n    print("suficient")\nelse:\n    print("insuficient")',
+  tests: [{ inputs: ['10'], out: 'foarte bine' }, { inputs: ['7'], out: 'bine' }, { inputs: ['5'], out: 'suficient' }, { inputs: ['4'], out: 'insuficient' }] },
+if4: { text: 'Citește un an și afișează <code>bisect</code> sau <code>nebisect</code>. Un an este bisect dacă se împarte la 4, dar nu se împarte la 100, în afară de cazul în care se împarte la 400.',
+  starter: '', hint: '(an % 4 == 0 and an % 100 != 0) or an % 400 == 0',
+  sol: 'an = int(input())\nif (an % 4 == 0 and an % 100 != 0) or an % 400 == 0:\n    print("bisect")\nelse:\n    print("nebisect")',
+  tests: [{ inputs: ['2024'], out: 'bisect' }, { inputs: ['1900'], out: 'nebisect' }, { inputs: ['2000'], out: 'bisect' }, { inputs: ['2023'], out: 'nebisect' }] },
+
+/* --- Bucle --- */
+for1: { text: 'Afișează numerele de la 1 la 5, fiecare pe linia ei.',
+  starter: '', hint: 'for i in range(1, 6): print(i)',
+  sol: 'for i in range(1, 6):\n    print(i)', must: [['for|while', 'Folosește o buclă.']], tests: [{ out: '1\n2\n3\n4\n5' }] },
+for2: { text: 'Calculează în variabila <code>s</code> suma numerelor de la 1 la 100, folosind o buclă <code>for</code>.',
+  starter: 's = 0\n', hint: 'Pentru fiecare i din range(1, 101), adaugă i la s.',
+  sol: 's = 0\nfor i in range(1, 101):\n    s += i', must: [['for', 'Folosește o buclă for.']], tests: [{ check: '_chk(s == 5050, "s trebuie să fie 5050")' }] },
+for3: { text: 'Afișează tabla înmulțirii cu 3, de la 1 la 10, în formatul <code>3 x 1 = 3</code>, câte o linie pentru fiecare.',
+  starter: '', hint: 'print(f"3 x {i} = {3 * i}")',
+  sol: 'for i in range(1, 11):\n    print(f"3 x {i} = {3 * i}")', tests: [{ out: '3 x 1 = 3\n3 x 2 = 6\n3 x 3 = 9\n3 x 4 = 12\n3 x 5 = 15\n3 x 6 = 18\n3 x 7 = 21\n3 x 8 = 24\n3 x 9 = 27\n3 x 10 = 30' }] },
+for4: { text: 'Cu o buclă <code>while</code>, afișează (pe linii separate) puterile lui 2 mai mici decât 100: 1, 2, 4, 8, ...',
+  starter: '', hint: 'p = 1; while p < 100: print(p); p *= 2',
+  sol: 'p = 1\nwhile p < 100:\n    print(p)\n    p *= 2', must: [['while', 'Folosește while.']], tests: [{ out: '1\n2\n4\n8\n16\n32\n64' }] },
+for5: { text: 'Găsește primul număr mai mare decât 50 care se împarte la 7. Salvează-l în <code>gasit</code>. Folosește <code>break</code>.',
+  starter: '', hint: 'for n in range(51, 200): dacă n % 7 == 0, salvează și ieși cu break.',
+  sol: 'for n in range(51, 200):\n    if n % 7 == 0:\n        gasit = n\n        break', must: [['break', 'Folosește break.']], tests: [{ check: '_chk(gasit == 56, "gasit trebuie să fie 56")' }] },
+
+/* --- Liste --- */
+lst1: { text: 'Pentru lista <code>numere</code>, calculează <code>total</code> (suma), <code>maxim</code> (cel mai mare) și <code>n</code> (câte elemente are), cu funcții predefinite.',
+  starter: 'numere = [4, 8, 15, 16, 23, 42]\n', hint: 'sum(numere), max(numere), len(numere)',
+  sol: 'numere = [4, 8, 15, 16, 23, 42]\ntotal = sum(numere)\nmaxim = max(numere)\nn = len(numere)', tests: [{ check: '_chk(total == 108, "total trebuie să fie 108")\n_chk(maxim == 42, "maxim trebuie să fie 42")\n_chk(n == 6, "n trebuie să fie 6")' }] },
+lst2: { text: 'Lista <code>l</code> este <code>[1, 2, 3]</code>. Adaugă 4 la final, inserează 0 la început și șterge valoarea 2. Rezultatul: <code>[0, 1, 3, 4]</code>.',
+  starter: 'l = [1, 2, 3]\n', hint: 'append, insert(0, ...) și remove.',
+  sol: 'l = [1, 2, 3]\nl.append(4)\nl.insert(0, 0)\nl.remove(2)', mustNot: [['l\\s*=\\s*\\[\\s*0', 'Modifică lista cu metode, nu o rescrie.']], tests: [{ check: '_chk(l == [0, 1, 3, 4], "l trebuie să fie [0, 1, 3, 4]")' }] },
+lst3: { text: 'Salvează în <code>desc</code> elementele lui <code>v</code> sortate <b>descrescător</b>, fără să modifici lista <code>v</code>.',
+  starter: 'v = [5, 2, 9, 1]\n', hint: 'sorted(v, reverse=True) întoarce o listă nouă.',
+  sol: 'v = [5, 2, 9, 1]\ndesc = sorted(v, reverse=True)', tests: [{ check: '_chk(desc == [9, 5, 2, 1], "desc trebuie să fie [9, 5, 2, 1]")\n_chk(v == [5, 2, 9, 1], "lista v nu trebuie modificată")' }] },
+lst4: { text: 'Construiește lista <code>pare</code> cu numerele pare din <code>v</code>, folosind o buclă și <code>append</code>.',
+  starter: 'v = list(range(1, 11))\npare = []\n', hint: 'for x in v: if x % 2 == 0: pare.append(x)',
+  sol: 'v = list(range(1, 11))\npare = []\nfor x in v:\n    if x % 2 == 0:\n        pare.append(x)', must: [['append', 'Folosește append.']], tests: [{ check: '_chk(pare == [2, 4, 6, 8, 10], "pare trebuie să fie [2, 4, 6, 8, 10]")' }] },
+lst5: { text: 'Calculează în <code>media</code> media notelor din lista <code>note</code>.',
+  starter: 'note = [9, 7, 10, 8]\n', hint: 'sum(note) / len(note)',
+  sol: 'note = [9, 7, 10, 8]\nmedia = sum(note) / len(note)', tests: [{ check: '_chk(media == 8.5, "media trebuie să fie 8.5")' }] },
+
+/* --- Tupluri --- */
+tup1: { text: 'Despachetează tuplul <code>punct</code> în variabilele <code>x</code> și <code>y</code>, apoi calculează <code>dist</code>, distanța până la origine: <code>(x**2 + y**2) ** 0.5</code>.',
+  starter: 'punct = (3, 4)\n', hint: 'x, y = punct',
+  sol: 'punct = (3, 4)\nx, y = punct\ndist = (x ** 2 + y ** 2) ** 0.5', tests: [{ check: '_chk(x == 3 and y == 4, "x trebuie să fie 3 și y 4")\n_chk(dist == 5.0, "dist trebuie să fie 5.0")' }] },
+tup2: { text: 'Scrie funcția <code>min_max(lista)</code> care întoarce un tuplu <code>(minim, maxim)</code>.',
+  starter: 'def min_max(lista):\n    pass\n', hint: 'return min(lista), max(lista)',
+  sol: 'def min_max(lista):\n    return min(lista), max(lista)', tests: [{ check: '_chk(min_max([4, 1, 9]) == (1, 9), "min_max([4, 1, 9]) trebuie să dea (1, 9)")\n_chk(min_max([5]) == (5, 5), "min_max([5]) trebuie să dea (5, 5)")' }] },
+tup3: { text: 'Din tuplul <code>v</code>, extrage cu despachetare cu <code>*</code>: <code>prim</code> (primul), <code>mijloc</code> (lista celorlalte, fără capete) și <code>ultim</code>.',
+  starter: 'v = (10, 20, 30, 40, 50)\n', hint: 'prim, *mijloc, ultim = v',
+  sol: 'v = (10, 20, 30, 40, 50)\nprim, *mijloc, ultim = v', must: [['\\*', 'Folosește * la despachetare.']], tests: [{ check: '_chk(prim == 10 and ultim == 50, "prim trebuie să fie 10 și ultim 50")\n_chk(mijloc == [20, 30, 40], "mijloc trebuie să fie [20, 30, 40]")' }] },
+
+/* --- Dicționare --- */
+dic1: { text: 'Creează dicționarul <code>elev</code> cu cheile <code>"nume"</code> (valoarea <code>"Dan"</code>), <code>"clasa"</code> (10) și <code>"medie"</code> (9.5).',
+  starter: '', hint: 'elev = {"nume": "Dan", "clasa": 10, "medie": 9.5}',
+  sol: 'elev = {"nume": "Dan", "clasa": 10, "medie": 9.5}', tests: [{ check: '_chk(elev == {"nume": "Dan", "clasa": 10, "medie": 9.5}, "elev trebuie să aibă cheile nume, clasa și medie cu valorile cerute")' }] },
+dic2: { text: 'În dicționarul <code>stoc</code>, adaugă cheia <code>"prune"</code> cu valoarea 12 și mărește cu 3 valoarea de la <code>"mere"</code>.',
+  starter: 'stoc = {"mere": 5, "pere": 0}\n', hint: 'stoc["prune"] = 12 și stoc["mere"] += 3',
+  sol: 'stoc = {"mere": 5, "pere": 0}\nstoc["prune"] = 12\nstoc["mere"] += 3', tests: [{ check: '_chk(stoc == {"mere": 8, "pere": 0, "prune": 12}, "stoc trebuie să fie {mere: 8, pere: 0, prune: 12}")' }] },
+dic3: { text: 'Numără de câte ori apare fiecare literă din <code>"banana"</code> într-un dicționar <code>frecv</code>.',
+  starter: 'frecv = {}\n', hint: 'for l in "banana": frecv[l] = frecv.get(l, 0) + 1',
+  sol: 'frecv = {}\nfor l in "banana":\n    frecv[l] = frecv.get(l, 0) + 1', tests: [{ check: '_chk(frecv == {"b": 1, "a": 3, "n": 2}, "frecv trebuie să fie {b: 1, a: 3, n: 2}")' }] },
+dic4: { text: 'Calculează în <code>total</code> suma tuturor prețurilor din dicționarul <code>preturi</code>.',
+  starter: 'preturi = {"paine": 4, "lapte": 7, "oua": 12}\n', hint: 'sum(preturi.values())',
+  sol: 'preturi = {"paine": 4, "lapte": 7, "oua": 12}\ntotal = sum(preturi.values())', tests: [{ check: '_chk(total == 23, "total trebuie să fie 23")' }] },
+
+/* --- Mulțimi --- */
+set1: { text: 'Din lista <code>lista</code>, creează lista <code>unice</code> cu valorile distincte, ordonate crescător.',
+  starter: 'lista = [3, 1, 3, 2, 1]\n', hint: 'sorted(set(lista))',
+  sol: 'lista = [3, 1, 3, 2, 1]\nunice = sorted(set(lista))', tests: [{ check: '_chk(unice == [1, 2, 3], "unice trebuie să fie [1, 2, 3]")' }] },
+set2: { text: 'Salvează în <code>comune</code> elementele care apar în <b>ambele</b> mulțimi <code>a</code> și <code>b</code> (intersecția).',
+  starter: 'a = {1, 2, 3, 4}\nb = {3, 4, 5}\n', hint: 'a & b sau a.intersection(b)',
+  sol: 'a = {1, 2, 3, 4}\nb = {3, 4, 5}\ncomune = a & b', tests: [{ check: '_chk(comune == {3, 4}, "comune trebuie să fie {3, 4}")' }] },
+
+/* --- Funcții --- */
+fn1: { text: 'Scrie funcția <code>aria_patrat(l)</code> care <b>returnează</b> aria unui pătrat cu latura <code>l</code>.',
+  starter: 'def aria_patrat(l):\n    pass\n', hint: 'return l * l',
+  sol: 'def aria_patrat(l):\n    return l * l', tests: [{ check: '_chk(aria_patrat(5) == 25, "aria_patrat(5) trebuie să returneze 25")\n_chk(aria_patrat(1.5) == 2.25, "aria_patrat(1.5) trebuie să returneze 2.25")' }] },
+fn2: { text: 'Scrie funcția <code>maxim(a, b)</code> care returnează cel mai mare dintre două numere, <b>fără</b> să folosești <code>max()</code>.',
+  starter: 'def maxim(a, b):\n    pass\n', hint: 'if a > b: return a, altfel return b.',
+  sol: 'def maxim(a, b):\n    if a > b:\n        return a\n    return b', mustNot: [['max\\(\\s*a', 'Nu folosi max().']],
+  tests: [{ check: '_chk(maxim(3, 7) == 7, "maxim(3, 7) trebuie să dea 7")\n_chk(maxim(9, 2) == 9, "maxim(9, 2) trebuie să dea 9")\n_chk(maxim(-1, -5) == -1, "maxim(-1, -5) trebuie să dea -1")' }] },
+fn3: { text: 'Scrie funcția <code>salut(nume, formula="Salut")</code> care returnează textul <code>"Salut, Ana!"</code> (cu <code>formula</code> în loc de „Salut” când este dată).',
+  starter: 'def salut(nume, formula="Salut"):\n    pass\n', hint: 'return f"{formula}, {nume}!"',
+  sol: 'def salut(nume, formula="Salut"):\n    return f"{formula}, {nume}!"', tests: [{ check: '_chk(salut("Ana") == "Salut, Ana!", "salut(\\"Ana\\") trebuie să dea \\"Salut, Ana!\\"")\n_chk(salut("Dan", "Bună") == "Bună, Dan!", "salut(\\"Dan\\", \\"Bună\\") trebuie să dea \\"Bună, Dan!\\"")' }] },
+fn4: { text: 'Scrie funcția <code>suma(*numere)</code> care adună oricâte argumente primește (și întoarce 0 dacă nu primește niciunul).',
+  starter: 'def suma(*numere):\n    pass\n', hint: 'numere este un tuplu; poți folosi sum(numere).',
+  sol: 'def suma(*numere):\n    return sum(numere)', tests: [{ check: '_chk(suma() == 0, "suma() trebuie să dea 0")\n_chk(suma(1, 2, 3) == 6, "suma(1, 2, 3) trebuie să dea 6")\n_chk(suma(10) == 10, "suma(10) trebuie să dea 10")' }] },
+fn5: { text: 'Scrie funcția <b>recursivă</b> <code>factorial(n)</code>. Convenție: <code>factorial(0)</code> este 1.',
+  starter: 'def factorial(n):\n    pass\n', hint: 'Caz de bază: n <= 1 întoarce 1. Altfel: n * factorial(n - 1).',
+  sol: 'def factorial(n):\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)', must: [['factorial\\([\\s\\S]*factorial\\(', 'Funcția trebuie să se apeleze pe ea însăși.']], mustNot: [['math', 'Fără biblioteca math: scrie tu funcția recursivă.']],
+  tests: [{ check: '_chk(factorial(0) == 1, "factorial(0) trebuie să dea 1")\n_chk(factorial(5) == 120, "factorial(5) trebuie să dea 120")\n_chk(factorial(7) == 5040, "factorial(7) trebuie să dea 5040")' }] },
+fn6: { text: 'Scrie funcția <code>este_prim(n)</code> care returnează <code>True</code> dacă n este prim și <code>False</code> altfel (0 și 1 nu sunt prime).',
+  starter: 'def este_prim(n):\n    pass\n', hint: 'Dacă n < 2 nu e prim. Verifică dacă vreun d de la 2 la n-1 (sau până la radical) împarte exact n.',
+  sol: 'def este_prim(n):\n    if n < 2:\n        return False\n    for d in range(2, n):\n        if n % d == 0:\n            return False\n    return True',
+  tests: [{ check: '_chk(este_prim(0) is False and este_prim(1) is False, "0 și 1 nu sunt prime")\n_chk(este_prim(2) is True, "2 este prim")\n_chk(este_prim(15) is False, "15 nu este prim")\n_chk(este_prim(17) is True, "17 este prim")\n_chk(este_prim(97) is True and este_prim(100) is False, "97 este prim, 100 nu")' }] },
+
+/* --- Comprehensions --- */
+cmp1: { text: 'Cu o <b>list comprehension</b>, creează lista <code>patrate</code> cu pătratele numerelor de la 1 la 5.',
+  starter: '', hint: '[x ** 2 for x in range(1, 6)]',
+  sol: 'patrate = [x ** 2 for x in range(1, 6)]', must: [['\\[[^\\]]*for[^\\]]*in[^\\]]*\\]', 'Folosește o list comprehension: [... for ... in ...]']], tests: [{ check: '_chk(patrate == [1, 4, 9, 16, 25], "patrate trebuie să fie [1, 4, 9, 16, 25]")' }] },
+cmp2: { text: 'Cu o list comprehension cu condiție, creează lista <code>cuburi_pare</code> cu cuburile numerelor <b>pare</b> de la 1 la 10.',
+  starter: '', hint: '[x ** 3 for x in range(1, 11) if x % 2 == 0]',
+  sol: 'cuburi_pare = [x ** 3 for x in range(1, 11) if x % 2 == 0]', must: [['\\[[^\\]]*for[^\\]]*if[^\\]]*\\]', 'Folosește o list comprehension cu if.']], tests: [{ check: '_chk(cuburi_pare == [8, 64, 216, 512, 1000], "cuburi_pare trebuie să fie [8, 64, 216, 512, 1000]")' }] },
+cmp3: { text: 'Cu un <b>dict comprehension</b>, creează dicționarul <code>lungimi</code> care asociază fiecare cuvânt din <code>cuvinte</code> cu lungimea lui.',
+  starter: 'cuvinte = ["ana", "mere", "kiwi"]\n', hint: '{c: len(c) for c in cuvinte}',
+  sol: 'cuvinte = ["ana", "mere", "kiwi"]\nlungimi = {c: len(c) for c in cuvinte}', must: [['\\{[^}]*for[^}]*\\}', 'Folosește un dict comprehension: {k: v for ...}']], tests: [{ check: '_chk(lungimi == {"ana": 3, "mere": 4, "kiwi": 4}, "lungimi trebuie să fie {ana: 3, mere: 4, kiwi: 4}")' }] },
+cmp4: { text: 'Salvează în <code>ordonat</code> cuvintele din listă sortate după lungime, de la cel mai lung la cel mai scurt (folosește <code>key</code>).',
+  starter: 'cuvinte = ["kiwi", "pruna", "banana", "fig"]\n', hint: 'sorted(cuvinte, key=len, reverse=True)',
+  sol: 'cuvinte = ["kiwi", "pruna", "banana", "fig"]\nordonat = sorted(cuvinte, key=len, reverse=True)', must: [['key', 'Folosește parametrul key.']], tests: [{ check: '_chk(ordonat == ["banana", "pruna", "kiwi", "fig"], "ordonat trebuie să fie [banana, pruna, kiwi, fig]")' }] },
+
+/* --- Excepții --- */
+exc1: { text: 'Scrie funcția <code>imparte(a, b)</code> care returnează <code>a / b</code>, iar când b este 0 returnează <code>None</code> (prinde excepția cu <code>try/except</code>).',
+  starter: 'def imparte(a, b):\n    pass\n', hint: 'try: return a / b, except ZeroDivisionError: return None',
+  sol: 'def imparte(a, b):\n    try:\n        return a / b\n    except ZeroDivisionError:\n        return None', must: [['try', 'Folosește try.'], ['except', 'Folosește except.']],
+  tests: [{ check: '_chk(imparte(6, 3) == 2, "imparte(6, 3) trebuie să dea 2.0")\n_chk(imparte(1, 0) is None, "imparte(1, 0) trebuie să dea None")' }] },
+exc2: { text: 'Scrie funcția <code>la_int(text)</code> care convertește textul în număr întreg, iar dacă nu se poate, returnează 0.',
+  starter: 'def la_int(text):\n    pass\n', hint: 'try: return int(text), except ValueError: return 0',
+  sol: 'def la_int(text):\n    try:\n        return int(text)\n    except ValueError:\n        return 0', must: [['try', 'Folosește try/except.']],
+  tests: [{ check: '_chk(la_int("12") == 12, "la_int(\\"12\\") trebuie să dea 12")\n_chk(la_int("abc") == 0, "la_int(\\"abc\\") trebuie să dea 0")\n_chk(la_int("") == 0, "la_int(\\"\\") trebuie să dea 0")' }] },
+exc3: { text: 'Scrie funcția <code>radical(n)</code> care returnează rădăcina pătrată a lui n (<code>n ** 0.5</code>) și <b>aruncă</b> <code>ValueError</code> dacă n este negativ.',
+  starter: 'def radical(n):\n    pass\n', hint: 'if n < 0: raise ValueError("...")',
+  sol: 'def radical(n):\n    if n < 0:\n        raise ValueError("n trebuie să fie pozitiv")\n    return n ** 0.5', must: [['raise', 'Folosește raise.']],
+  tests: [{ check: 'try:\n    radical(-1)\n    _chk(False, "radical(-1) trebuie să ridice ValueError")\nexcept ValueError:\n    pass\n_chk(radical(9) == 3.0, "radical(9) trebuie să dea 3.0")\n_chk(radical(0) == 0, "radical(0) trebuie să dea 0")' }] },
+
+/* --- OOP --- */
+oop1: { text: 'Scrie clasa <code>Dreptunghi</code> cu constructor <code>(l, h)</code> și metodele <code>aria()</code> și <code>perimetru()</code>.',
+  starter: 'class Dreptunghi:\n    pass\n', hint: 'def __init__(self, l, h): self.l = l; self.h = h. Metodele întorc l * h și 2 * (l + h).',
+  sol: 'class Dreptunghi:\n    def __init__(self, l, h):\n        self.l = l\n        self.h = h\n    def aria(self):\n        return self.l * self.h\n    def perimetru(self):\n        return 2 * (self.l + self.h)',
+  tests: [{ check: 'r = Dreptunghi(3, 4)\n_chk(r.aria() == 12, "Dreptunghi(3, 4).aria() trebuie să dea 12")\n_chk(r.perimetru() == 14, "Dreptunghi(3, 4).perimetru() trebuie să dea 14")\n_chk(Dreptunghi(5, 5).aria() == 25, "Dreptunghi(5, 5).aria() trebuie să dea 25")' }] },
+oop2: { text: 'Scrie clasa <code>Cont</code> cu atributul <code>sold</code> (inițial 0), metoda <code>depune(suma)</code> și metoda <code>retrage(suma)</code>. <code>retrage</code> scade suma și întoarce <code>True</code>, dar dacă nu sunt destui bani, nu modifică soldul și întoarce <code>False</code>.',
+  starter: 'class Cont:\n    pass\n', hint: 'În retrage: if suma > self.sold: return False. Altfel scazi și return True.',
+  sol: 'class Cont:\n    def __init__(self):\n        self.sold = 0\n    def depune(self, suma):\n        self.sold += suma\n    def retrage(self, suma):\n        if suma > self.sold:\n            return False\n        self.sold -= suma\n        return True',
+  tests: [{ check: 'c = Cont()\n_chk(c.sold == 0, "soldul inițial trebuie să fie 0")\nc.depune(100)\n_chk(c.sold == 100, "după depune(100), sold trebuie să fie 100")\n_chk(c.retrage(30) is True and c.sold == 70, "retrage(30) trebuie să dea True și sold 70")\n_chk(c.retrage(500) is False and c.sold == 70, "retrage(500) trebuie să dea False și să nu schimbe soldul")' }] },
+oop3: { text: 'Clasa <code>Animal</code> există deja. Scrie clasa <code>Pisica</code> care moștenește din <code>Animal</code> și suprascrie metoda <code>sunet</code> astfel încât să returneze <code>"miau"</code>.',
+  starter: 'class Animal:\n    def __init__(self, nume):\n        self.nume = nume\n    def sunet(self):\n        return "..."\n    def prezinta(self):\n        return f"{self.nume} face {self.sunet()}"\n\n# scrie clasa Pisica aici\n',
+  hint: 'class Pisica(Animal): și în ea def sunet(self): return "miau".',
+  sol: 'class Animal:\n    def __init__(self, nume):\n        self.nume = nume\n    def sunet(self):\n        return "..."\n    def prezinta(self):\n        return f"{self.nume} face {self.sunet()}"\n\nclass Pisica(Animal):\n    def sunet(self):\n        return "miau"',
+  must: [['class\\s+Pisica\\s*\\(\\s*Animal\\s*\\)', 'Pisica trebuie să moștenească din Animal: class Pisica(Animal):']],
+  tests: [{ check: '_chk(Pisica("Tom").prezinta() == "Tom face miau", "Pisica(\\"Tom\\").prezinta() trebuie să dea \\"Tom face miau\\"")\n_chk(Animal("X").prezinta() == "X face ...", "Animal trebuie să rămână neschimbat")' }] },
+
+/* --- Avansat --- */
+adv1: { text: 'Scrie un <b>generator</b> <code>pare(n)</code> care oferă (cu <code>yield</code>) numerele pare de la 0 până la n inclusiv.',
+  starter: 'def pare(n):\n    pass\n', hint: 'i = 0; while i <= n: yield i; i += 2',
+  sol: 'def pare(n):\n    i = 0\n    while i <= n:\n        yield i\n        i += 2', must: [['yield', 'Folosește yield.']],
+  tests: [{ check: '_chk(list(pare(7)) == [0, 2, 4, 6], "list(pare(7)) trebuie să fie [0, 2, 4, 6]")\n_chk(list(pare(0)) == [0], "list(pare(0)) trebuie să fie [0]")' }] },
+adv2: { text: 'Scrie funcția <code>inmulteste(k)</code> care <b>returnează o funcție</b>; funcția returnată primește un număr x și întoarce <code>x * k</code>.',
+  starter: 'def inmulteste(k):\n    pass\n', hint: 'Definește o funcție în interior și returneaz-o (fără paranteze).',
+  sol: 'def inmulteste(k):\n    def f(x):\n        return x * k\n    return f',
+  tests: [{ check: '_chk(inmulteste(3)(4) == 12, "inmulteste(3)(4) trebuie să dea 12")\ndublu = inmulteste(2)\n_chk(dublu(10) == 20, "inmulteste(2)(10) trebuie să dea 20")' }] },
+adv3: { text: 'Completează decoratorul <code>dublu</code> astfel încât rezultatul funcției decorate să fie înmulțit cu 2. Funcția <code>trei()</code> este deja decorată.',
+  starter: 'def dublu(functie):\n    def invelis(*args, **kwargs):\n        pass\n    return invelis\n\n@dublu\ndef trei():\n    return 3\n',
+  hint: 'În invelis: return functie(*args, **kwargs) * 2',
+  sol: 'def dublu(functie):\n    def invelis(*args, **kwargs):\n        return functie(*args, **kwargs) * 2\n    return invelis\n\n@dublu\ndef trei():\n    return 3',
+  tests: [{ check: '_chk(trei() == 6, "trei() decorată trebuie să dea 6")' }] },
+
+/* --- Mixte --- */
+mix1: { text: '<b>FizzBuzz.</b> Afișează numerele de la 1 la 15, fiecare pe linia ei, dar: în loc de multiplii lui 3 scrie <code>Fizz</code>, în loc de multiplii lui 5 scrie <code>Buzz</code>, iar pentru multiplii ambelor scrie <code>FizzBuzz</code>.',
+  starter: '', hint: 'Verifică întâi dacă se împarte la 15 (sau la 3 și la 5), apoi la 3, apoi la 5.',
+  sol: 'for i in range(1, 16):\n    if i % 15 == 0:\n        print("FizzBuzz")\n    elif i % 3 == 0:\n        print("Fizz")\n    elif i % 5 == 0:\n        print("Buzz")\n    else:\n        print(i)',
+  tests: [{ out: '1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz' }] },
+mix2: { text: 'Scrie funcția <code>palindrom(s)</code> care returnează <code>True</code> dacă textul se citește la fel în ambele sensuri, fără să conteze literele mari/mici.',
+  starter: 'def palindrom(s):\n    pass\n', hint: 'Convertește în litere mici și compară cu inversul.',
+  sol: 'def palindrom(s):\n    s = s.lower()\n    return s == s[::-1]',
+  tests: [{ check: '_chk(palindrom("radar") is True, "radar este palindrom")\n_chk(palindrom("Ana") is True, "Ana este palindrom (fără diferență între litere mari și mici)")\n_chk(palindrom("python") is False, "python nu este palindrom")\n_chk(palindrom("") is True, "șirul gol este palindrom")' }] },
+mix3: { text: 'Scrie funcția <code>fib_lista(n)</code> care returnează lista primilor n termeni din șirul lui Fibonacci (0, 1, 1, 2, 3, 5, ...).',
+  starter: 'def fib_lista(n):\n    pass\n', hint: 'Ține două variabile a, b = 0, 1; la fiecare pas adaugă a în listă și mută a, b = b, a + b.',
+  sol: 'def fib_lista(n):\n    rez = []\n    a, b = 0, 1\n    for _ in range(n):\n        rez.append(a)\n        a, b = b, a + b\n    return rez',
+  tests: [{ check: '_chk(fib_lista(7) == [0, 1, 1, 2, 3, 5, 8], "fib_lista(7) trebuie să fie [0, 1, 1, 2, 3, 5, 8]")\n_chk(fib_lista(1) == [0], "fib_lista(1) trebuie să fie [0]")\n_chk(fib_lista(0) == [], "fib_lista(0) trebuie să fie []")\n_chk(fib_lista(12)[-1] == 89, "al 12-lea termen trebuie să fie 89")' }] },
+mix4: { text: 'Scrie funcția <code>numara_vocale(text)</code> care returnează câte vocale (a, e, i, o, u, mari sau mici) are textul.',
+  starter: 'def numara_vocale(text):\n    pass\n', hint: 'Parcurge literele lui text.lower() și numără-le pe cele din "aeiou".',
+  sol: 'def numara_vocale(text):\n    n = 0\n    for c in text.lower():\n        if c in "aeiou":\n            n += 1\n    return n',
+  tests: [{ check: '_chk(numara_vocale("Programare") == 4, "Programare are 4 vocale")\n_chk(numara_vocale("xyz") == 0, "xyz are 0 vocale")\n_chk(numara_vocale("AEIOU") == 5, "AEIOU are 5 vocale")' }] },
+mix5: { text: 'Scrie funcția <code>frecventa_cuvinte(text)</code> care returnează un dicționar cu numărul de apariții al fiecărui cuvânt din text (cuvintele sunt separate prin spațiu).',
+  starter: 'def frecventa_cuvinte(text):\n    pass\n', hint: 'text.split() dă lista cuvintelor; apoi numără cu un dicționar și .get(c, 0).',
+  sol: 'def frecventa_cuvinte(text):\n    d = {}\n    for c in text.split():\n        d[c] = d.get(c, 0) + 1\n    return d',
+  tests: [{ check: '_chk(frecventa_cuvinte("a b a c a b") == {"a": 3, "b": 2, "c": 1}, "frecventa_cuvinte(\\"a b a c a b\\") trebuie să dea {a: 3, b: 2, c: 1}")\n_chk(frecventa_cuvinte("") == {}, "pentru text gol trebuie să dea {}")' }] },
+mix6: { text: 'Scrie funcția <code>anagrame(a, b)</code> care returnează <code>True</code> dacă cele două cuvinte conțin exact aceleași litere (în altă ordine), fără diferență între litere mari și mici.',
+  starter: 'def anagrame(a, b):\n    pass\n', hint: 'Dacă sortezi literele ambelor cuvinte (în litere mici), anagramele devin identice.',
+  sol: 'def anagrame(a, b):\n    return sorted(a.lower()) == sorted(b.lower())',
+  tests: [{ check: '_chk(anagrame("listen", "silent") is True, "listen și silent sunt anagrame")\n_chk(anagrame("Roma", "Amor") is True, "Roma și Amor sunt anagrame")\n_chk(anagrame("abc", "abd") is False, "abc și abd nu sunt anagrame")\n_chk(anagrame("ab", "abb") is False, "ab și abb nu sunt anagrame")' }] }
+};
+/* ===== Interfața ===== */
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) {} return null; }
+
+  /* --- colorare sintaxă --- */
+  var KW = {}; 'False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield match case'.split(' ').forEach(function (w) { KW[w] = 1; });
+  var BI = {}; 'print input len range int float str bool list dict set tuple type isinstance sum min max abs round sorted reversed enumerate zip map filter any all open super self cls next iter divmod chr ord id dir bin hex'.split(' ').forEach(function (w) { BI[w] = 1; });
+  var TOK = /(#[^\n]*)|("""[\s\S]*?"""|'''[\s\S]*?'''|[fFrRbB]{0,2}"(?:\\.|[^"\\\n])*"|[fFrRbB]{0,2}'(?:\\.|[^'\\\n])*')|(\b\d[\d_]*(?:\.\d+)?(?:[eE][+-]?\d+)?\b)|([A-Za-z_À-ɏ]\w*)|(@[A-Za-z_]\w*)/g;
+  function hl(src) {
+    var out = '', last = 0, m;
+    TOK.lastIndex = 0;
+    while ((m = TOK.exec(src))) {
+      out += esc(src.slice(last, m.index));
+      var t = m[0];
+      if (m[1]) out += '<span class="c">' + esc(t) + '</span>';
+      else if (m[2]) out += '<span class="s">' + esc(t) + '</span>';
+      else if (m[3]) out += '<span class="m">' + esc(t) + '</span>';
+      else if (m[4]) {
+        if (KW[t]) out += '<span class="k">' + t + '</span>';
+        else if (/(def|class)\s+$/.test(src.slice(Math.max(0, m.index - 8), m.index))) out += '<span class="f">' + t + '</span>';
+        else if (BI[t]) out += '<span class="b">' + t + '</span>';
+        else out += t;
+      } else out += '<span class="f">' + esc(t) + '</span>';
+      last = m.index + t.length;
+    }
+    return out + esc(src.slice(last));
+  }
+
+  /* --- afișarea rezultatului --- */
+  function showOut(el, r) {
+    var h = esc(r.out || '');
+    if (r.err) {
+      h += (h && !/\n$/.test(r.out) ? '\n' : '') + '<span class="e">' + esc(r.err.raw) + '</span>' + (r.err.tip ? '<span class="tip">' + esc(r.err.tip) + '</span>' : '');
+    }
+    if (!h) h = '<span style="opacity:.6">(programul nu a afișat nimic)</span>';
+    el.innerHTML = h; el.hidden = false;
+  }
+  function engineReady() { return typeof Sk !== 'undefined' && Sk.configure; }
+  function noEngine(el) {
+    el.innerHTML = '<span class="e">Motorul Python nu s-a încărcat (conexiune sau blocare). Reîncarcă pagina.</span>'; el.hidden = false;
+  }
+
+  /* --- blocuri de cod din lecții --- */
+  function mkBlock(src, norun, inputs) {
+    var d = document.createElement('div'); d.className = 'cb';
+    var note = inputs && inputs.length ? '<div class="cb-note">input() primește: ' + esc(inputs.join(' · ')) + '</div>' : '';
+    d.innerHTML = '<div class="cb-bar"><span>python' + (norun ? ' · doar de citit' : '') + '</span><span class="cb-btns"><button class="ghost" data-a="copy">Copiază</button>' + (norun ? '' : '<button class="run" data-a="run">▶ Rulează</button>') + '</span></div>' + note + '<pre><code>' + hl(src) + '</code></pre><pre class="cb-out" hidden></pre>';
+    d.addEventListener('click', function (e) {
+      var a = e.target.getAttribute && e.target.getAttribute('data-a');
+      if (a === 'copy') {
+        var b = e.target;
+        var done = function (t) { b.textContent = t; setTimeout(function () { b.textContent = 'Copiază'; }, 1400); };
+        try { navigator.clipboard.writeText(src).then(function () { done('Copiat'); }, function () { done('Selectează manual'); }); } catch (x) { done('Selectează manual'); }
+      } else if (a === 'run') {
+        var o = $('.cb-out', d);
+        if (!engineReady()) return noEngine(o);
+        e.target.disabled = true; o.hidden = false; o.textContent = 'rulează...';
+        runPy(src, inputs || []).then(function (r) { showOut(o, r); e.target.disabled = false; });
+      }
+    });
+    return d;
+  }
+  $$('textarea.code').forEach(function (ta) {
+    var inputs = ta.getAttribute('data-in'); inputs = inputs ? JSON.parse(inputs) : null;
+    ta.parentNode.replaceChild(mkBlock(ta.value.replace(/^\n/, '').replace(/\s+$/, ''), ta.classList.contains('norun'), inputs), ta);
+  });
+  $$('main table').forEach(function (t) { var w = document.createElement('div'); w.className = 'tw'; t.parentNode.insertBefore(w, t); w.appendChild(t); });
+
+  /* --- progres --- */
+  var done = {};
+  try { done = JSON.parse(store('py:done') || '{}') || {}; } catch (e) { done = {}; }
+  var chaps = $$('section.chap');
+  function chapExIds(sec) { return $$('.ex', sec).map(function (d) { return d.getAttribute('data-ex'); }); }
+  var TOTAL = 0, ids = {};
+  chaps.forEach(function (s) { ids[s.getAttribute('data-id')] = chapExIds(s); TOTAL += ids[s.getAttribute('data-id')].length; });
+  function refresh() {
+    var n = 0;
+    chaps.forEach(function (s) {
+      var id = s.getAttribute('data-id'), ex = ids[id], c = ex.filter(function (x) { return done[x]; }).length; n += c;
+      var a = $('nav a[data-id="' + id + '"]'); if (!a) return;
+      var b = $('.b', a); b.textContent = ex.length ? (c === ex.length ? '✓' : c + '/' + ex.length) : '';
+      a.classList.toggle('done', ex.length > 0 && c === ex.length);
+    });
+    $('#pbar').style.width = (TOTAL ? n / TOTAL * 100 : 0) + '%';
+    $('#ptxt').textContent = n + ' / ' + TOTAL + ' exerciții';
+  }
+
+  /* --- navigator --- */
+  var nav = $('nav'), idx = 0;
+  var html = '<h4>Lecții</h4>';
+  chaps.forEach(function (s, i) {
+    var id = s.getAttribute('data-id'), t = s.getAttribute('data-title');
+    if (id === 'joaca') html += '<h4>Liber</h4>';
+    html += '<a href="#' + id + '" data-id="' + id + '"><span class="n">' + (id === 'joaca' ? '▶' : i + 1) + '</span><span class="t">' + esc(t) + '</span><span class="b"></span></a>';
+    var k = document.createElement('div'); k.className = 'kicker';
+    k.textContent = id === 'joaca' ? 'Experimentează liber' : 'Capitolul ' + (i + 1) + ' din ' + (chaps.length - 1);
+    s.insertBefore(k, s.firstChild);
+  });
+  html += '<div class="engine wait" id="eng">Se încarcă motorul Python…</div>';
+  nav.innerHTML = html;
+  $('.menu').addEventListener('click', function () { nav.classList.toggle('open'); });
+
+  /* prev / next */
+  chaps.forEach(function (s, i) {
+    var p = chaps[i - 1], n = chaps[i + 1];
+    if (s.getAttribute('data-id') === 'joaca') return;
+    var d = document.createElement('div'); d.className = 'pn';
+    d.innerHTML = (p ? '<button data-go="' + p.getAttribute('data-id') + '"><small>← Înapoi</small><strong>' + esc(p.getAttribute('data-title')) + '</strong></button>' : '<span></span>') +
+      (n ? '<button class="next" data-go="' + n.getAttribute('data-id') + '"><small>Următorul →</small><strong>' + esc(n.getAttribute('data-title')) + '</strong></button>' : '');
+    d.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) go(b.getAttribute('data-go')); });
+    s.appendChild(d);
+  });
+
+  var mounted = {};
+  function show(id) {
+    if (!ids[id] && id !== 'joaca') id = chaps[0].getAttribute('data-id');
+    chaps.forEach(function (s) { s.hidden = s.getAttribute('data-id') !== id; });
+    $$('nav a').forEach(function (a) { a.classList.toggle('on', a.getAttribute('data-id') === id); });
+    if (!mounted[id]) { mounted[id] = 1; mount(id); }
+    nav.classList.remove('open');
+    store('py:last', id);
+    window.scrollTo(0, 0);
+    var t = $('section[data-id="' + id + '"]').getAttribute('data-title'); document.title = t + ' · Python de la zero';
+  }
+  function go(id) { if (location.hash.slice(1) === id) show(id); else location.hash = id; }
+  window.addEventListener('hashchange', function () { show(location.hash.slice(1)); });
+
+  /* --- editor --- */
+  function setupEditor(ta, onRun) {
+    function fit() { ta.style.height = 'auto'; ta.style.height = Math.min(Math.max(ta.scrollHeight + 2, 96), 520) + 'px'; }
+    ta.addEventListener('input', fit);
+    ta.addEventListener('keydown', function (e) {
+      if (e.key === 'Tab') {
+        e.preventDefault(); var s = ta.selectionStart, en = ta.selectionEnd;
+        ta.value = ta.value.slice(0, s) + '    ' + ta.value.slice(en); ta.selectionStart = ta.selectionEnd = s + 4;
+        ta.dispatchEvent(new Event('input'));
+      } else if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        var st = ta.selectionStart, v = ta.value, ls = v.lastIndexOf('\n', st - 1) + 1, line = v.slice(ls, st);
+        var ind = line.match(/^ */)[0];
+        if (/:\s*(#.*)?$/.test(line)) ind += '    ';
+        e.preventDefault();
+        ta.value = v.slice(0, st) + '\n' + ind + v.slice(ta.selectionEnd); ta.selectionStart = ta.selectionEnd = st + 1 + ind.length;
+        ta.dispatchEvent(new Event('input'));
+      } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && onRun) { e.preventDefault(); onRun(); }
+    });
+    setTimeout(fit, 0);
+    return fit;
+  }
+
+  /* --- exerciții --- */
+  function mountEx(div, num) {
+    var id = div.getAttribute('data-ex'), ex = EX[id];
+    if (!ex) { div.textContent = 'Exercițiu lipsă: ' + id; return; }
+    var hasIn = ex.tests && ex.tests[0] && ex.tests[0].inputs;
+    div.className = 'exc'; div.id = 'ex-' + id;
+    div.innerHTML = '<div class="exh"><span class="exn">Exercițiul ' + num + '</span><span class="exs"></span></div><p class="ext">' + ex.text + '</p>' +
+      '<textarea class="ed" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Codul tău"></textarea>' +
+      (hasIn ? '<label class="inl" for="in-' + id + '">Valori pentru input(), câte una pe linie (doar pentru Rulează)</label><textarea class="inp" id="in-' + id + '" spellcheck="false">' + esc(ex.tests[0].inputs.join('\n')) + '</textarea>' : '') +
+      '<div class="btns"><button class="run2" data-a="run">▶ Rulează</button><button class="go" data-a="check">Verifică</button><button data-a="hint">Indiciu</button><button data-a="sol" disabled title="Se deblochează după o verificare greșită sau după un indiciu">Soluția</button><button data-a="reset">Resetează</button></div>' +
+      '<div class="res"></div>';
+    var ed = $('.ed', div), res = $('.res', div), failed = false, hinted = false;
+    var saved = store('py:c:' + id);
+    ed.value = saved !== null && saved !== undefined ? saved : ex.starter;
+    var fit = setupEditor(ed, function () { $('[data-a=run]', div).click(); });
+    ed.addEventListener('input', function () { store('py:c:' + id, ed.value); });
+    function state() { $('.exs', div).textContent = done[id] ? '✓ rezolvat' : ''; div.classList.toggle('ok', !!done[id]); }
+    state();
+    function unlock() { if (failed || hinted) $('[data-a=sol]', div).disabled = false; }
+    div.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return; var a = b.getAttribute('data-a');
+      if (a === 'reset') { ed.value = ex.starter; store('py:c:' + id, ed.value); fit(); res.innerHTML = ''; return; }
+      if (a === 'hint') { hinted = true; unlock(); var hb = $('.hintbox', div); if (!hb) { hb = document.createElement('div'); hb.className = 'hintbox'; res.parentNode.insertBefore(hb, res); } hb.innerHTML = '<b>Indiciu:</b> ' + esc(ex.hint); return; }
+      if (a === 'sol') {
+        var sb = $('.solbox', div); if (sb) { sb.remove(); return; }
+        sb = document.createElement('div'); sb.className = 'solbox'; sb.innerHTML = '<small>Soluție posibilă (există și alte variante corecte):</small>';
+        sb.appendChild(mkBlock(ex.sol, true)); res.parentNode.insertBefore(sb, res.nextSibling); return;
+      }
+      if (!engineReady()) { res.innerHTML = '<div class="verdict no">Motorul Python nu s-a încărcat. Reîncarcă pagina.</div>'; return; }
+      b.disabled = true;
+      if (a === 'run') {
+        var inEl = $('.inp', div), inputs = inEl ? inEl.value.split('\n') : [];
+        res.innerHTML = '<div class="cb"><pre class="cb-out">rulează...</pre></div>';
+        runPy(ed.value, inputs).then(function (r) { res.innerHTML = '<div class="cb"><pre class="cb-out"></pre></div>'; showOut($('.cb-out', res), r); b.disabled = false; });
+      } else {
+        res.innerHTML = '<div class="verdict">se verifică...</div>';
+        verify(ex, ed.value).then(function (r) {
+          b.disabled = false;
+          if (r.ok) {
+            done[id] = 1; store('py:done', JSON.stringify(done)); state(); refresh();
+            res.innerHTML = '<div class="verdict ok"><b>Corect!</b>Soluția ta trece toate testele.</div>';
+          } else {
+            failed = true; unlock();
+            var h = '<div class="verdict no"><b>Încă nu</b>' + esc(r.msg);
+            if (r.err && r.err.raw && !/Verificarea/.test(r.msg)) h += '<pre>' + esc(r.err.raw) + (r.err.tip ? '\n' + esc(r.err.tip) : '') + '</pre>';
+            if (r.showDiff) h += '<div class="cmp"><div><small>Așteptat</small><pre>' + esc(r.expected) + '</pre></div><div><small>Programul tău a afișat</small><pre>' + esc(r.got || '(nimic)') + '</pre></div></div>';
+            res.innerHTML = h + '</div>';
+          }
+        });
+      }
+    });
+  }
+  function mount(id) {
+    var sec = $('section[data-id="' + id + '"]');
+    $$('.ex', sec).forEach(function (d, i) { mountEx(d, i + 1); });
+    if (id === 'joaca') mountPlay();
+  }
+
+  /* --- teren de joacă --- */
+  function mountPlay() {
+    var d = $('#playground');
+    d.innerHTML = '<textarea class="ed" id="pg-code" spellcheck="false" aria-label="Cod Python" style="min-height:220px"></textarea><label class="inl" for="pg-in">Valori pentru input(), câte una pe linie</label><textarea class="inp" id="pg-in" spellcheck="false"></textarea><div class="btns exc" style="padding:0;border:0;margin:12px 0 0;background:none"><button class="go" id="pg-run">▶ Rulează (Ctrl+Enter)</button></div><div class="cb" style="margin-top:12px"><pre class="cb-out" id="pg-out">Rezultatul apare aici.</pre></div>';
+    var ed = $('#pg-code');
+    var sv = store('py:play');
+    ed.value = sv !== null && sv !== undefined ? sv : '# Încearcă ceva\nnume = "lume"\nfor i in range(3):\n    print(f"Salut, {nume}! ({i + 1})")\n';
+    function run() {
+      store('py:play', ed.value);
+      var o = $('#pg-out'); if (!engineReady()) return noEngine(o);
+      o.textContent = 'rulează...'; runPy(ed.value, $('#pg-in').value.split('\n')).then(function (r) { showOut(o, r); });
+    }
+    setupEditor(ed, run); $('#pg-run').addEventListener('click', run);
+  }
+
+  /* --- pornire --- */
+  refresh();
+  var start = location.hash.slice(1) || store('py:last') || chaps[0].getAttribute('data-id');
+  show(start);
+  var tries = 0;
+  (function wait() {
+    var e = $('#eng');
+    if (engineReady()) { e.className = 'engine ok'; e.textContent = 'Motor Python pregătit'; return; }
+    if (++tries > 80) { e.className = 'engine err'; e.textContent = 'Motorul Python nu s-a încărcat. Lecțiile se pot citi, dar codul nu poate rula. Reîncarcă pagina.'; return; }
+    setTimeout(wait, 250);
+  })();
+})();
+
+</script>
+
+</body></html>
